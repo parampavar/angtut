@@ -14,12 +14,11 @@ var mongoose = require('mongoose')
 
 var LeagueSchema = new Schema({
   name: {type: String},
-  commissioner: {type: Schema.ObjectId, ref: 'User'}
+   commissioner: {type: Schema.ObjectId, ref: 'User'}
 })
 
 LeagueSchema.statics = {
 	load: function(id, cb) {
-        console.log("In model");
 		this.findOne( {_id: id} ).populate('commissioner').exec(cb);
 	}
 };

@@ -21,10 +21,17 @@ module.exports = function (app, passport, auth) {
 	app.get('/leagues/:leagueId', leagues.show)
 	app.put('/leagues/:leagueId', auth.requiresLogin, leagues.update)
 	app.del('/leagues/:leagueId', auth.requiresLogin, leagues.destroy)
-	 
 	app.param('leagueId', leagues.league)
 
-	// home route
+    var fantasyteams = require('../app/controllers/fantasyteams')
+    app.get('/fantasyteams', fantasyteams.all)
+    app.post('/fantasyteams', auth.requiresLogin, fantasyteams.create)
+    app.get('/fantasyteams/:leagueId', leagues.show)
+    app.put('/fantasyteams/:leagueId', auth.requiresLogin, fantasyteams.update)
+    app.del('/fantasyteams/:leagueId', auth.requiresLogin, fantasyteams.destroy)
+    app.param('fantasyteamId', fantasyteams.fantasyteam)
+
+    // home route
 	var index = require('../app/controllers/index')
 	app.get('/', index.render)
 
