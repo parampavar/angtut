@@ -19,6 +19,7 @@ var LeagueSchema = new Schema({
 
 LeagueSchema.statics = {
 	load: function(id, cb) {
+        console.log("In model");
 		this.findOne( {_id: id} ).populate('commissioner').exec(cb);
 	}
 };

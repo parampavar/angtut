@@ -1,7 +1,7 @@
 window.angular.module('ngff.services.leagues', [])
     .factory('Leagues', ['$resource',
     function($resource){
-        return $resource('leagues/:leaguedId',
+        return $resource('leagues/:leagueId',
             {
                 leagueId: '@_id'
             },

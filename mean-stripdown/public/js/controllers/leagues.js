@@ -20,6 +20,7 @@ window.angular.module('ngff.controllers.leagues', [])
                 Leagues.get({ leagueId: $routeParams.leagueId }, function (league) {
                     $scope.league = league;
                 });
+                console.log($routeParams);
             };
             $scope.update = function () {
                 var league = $scope.league;
