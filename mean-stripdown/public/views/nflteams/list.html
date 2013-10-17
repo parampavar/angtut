@@ -1,0 +1,10 @@
+<section ng-controller="NFLTeamsController" ng-init="find()">
+    <ul class="unstyled">
+        <h2>NFL Teams</h2>
+        <li ng-repeat="nflteam in nflteams">
+            <a href="#!/nflteams/{{ nflteam._id }}">{{ nflteam.team }} </a>
+        </li>
+    </ul>
+    <br>
+    Herere
+</section>

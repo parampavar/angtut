@@ -19,7 +19,7 @@ var FantasyTeamSchema = new Schema({
     players: [{type: Schema.ObjectId, ref: 'Player'}]
 })
 
-LeagueSchema.statics = {
+FantasyTeamSchema.statics = {
 	load: function(id, cb) {
 		this.findOne( {_id: id} ).populate('owner').populate('league').exec(cb);
 	}

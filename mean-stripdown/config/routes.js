@@ -31,6 +31,11 @@ module.exports = function (app, passport, auth) {
     app.del('/fantasyteams/:leagueId', auth.requiresLogin, fantasyteams.destroy)
     app.param('fantasyteamId', fantasyteams.fantasyteam)
 
+    var nflteams = require('../app/controllers/nflteams')
+    app.get('/nflteams', nflteams.all)
+    app.get('/nflteams/:nflteamId', nflteams.show)
+    app.param('nflteamId', nflteams.nflteam)
+
     // home route
 	var index = require('../app/controllers/index')
 	app.get('/', index.render)

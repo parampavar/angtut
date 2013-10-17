@@ -1,0 +1,2 @@
+C:\Users\ppavar\Downloads\mongodb-win32-i386-2.4.6\mongodb-win32-i386-2.4.6\bin\mongoimport.exe --host zoobi.dtdns.net --port 4100 --collection playerpositions --db ngff-dev --file playerpositions.json
+C:\Users\ppavar\Downloads\mongodb-win32-i386-2.4.6\mongodb-win32-i386-2.4.6\bin\mongoimport.exe --host zoobi.dtdns.net --port 4100 --collection nflteams --db ngff-dev --file teams.json
