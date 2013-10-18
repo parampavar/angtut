@@ -10,6 +10,7 @@ window.angular.module('ngff.controllers.NFLTeam', [])
             };
 
             $scope.findOne = function () {
+                console.log("public.js.controllers.nflteams.js");
                 NFLTeams.get({ nflteamId: $routeParams.nflteamId }, function (nflteam) {
                     $scope.nflteam = nflteam;
                 });
