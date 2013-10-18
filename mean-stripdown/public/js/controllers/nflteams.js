@@ -1,4 +1,4 @@
-window.angular.module('ngff.controllers.NFLTeams', [])
+window.angular.module('ngff.controllers.NFLTeam', [])
     .controller('NFLTeamsController', ['$scope', '$routeParams', '$location', 'Global', 'NFLTeams',
         function($scope, $routeParams, $location, Global, NFLTeams){
             $scope.global = Global;
