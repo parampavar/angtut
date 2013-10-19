@@ -36,6 +36,12 @@ module.exports = function (app, passport, auth) {
     app.get('/nflteams/:nflteamId', nflteams.show)
     app.param('nflteamId', nflteams.nflteam)
 
+    var playerpositions = require('../app/controllers/playerpositions')
+    app.get('/playerpositions', playerpositions.all)
+    app.get('/playerpositions/:playerpositionsId', playerpositions.show)
+    app.param('playerpositionsId', playerpositions.playerposition)
+
+
     // home route
 	var index = require('../app/controllers/index')
 	app.get('/', index.render)

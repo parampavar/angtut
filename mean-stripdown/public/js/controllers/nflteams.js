@@ -9,12 +9,10 @@ window.angular.module('ngff.controllers.NFLTeams', [])
                     $scope.nflteams = nflteams;
                 });
             };
-            $scope.nflteams = $scope.find();
             $scope.findOne = function () {
                 NFLTeams.get({ nflteamId: $routeParams.nflteamId }, function (nflteam) {
                     $scope.nflteam = nflteam;
                 });
             };
-            $scope.nflteam = $scope.findOne();
 
         }]);
