@@ -2,20 +2,20 @@
 window.app.config(['$routeProvider', function($routeProvider) {
 	$routeProvider
 	.when('/', { templateUrl: 'views/index.html' })
-/*	.when('/nflteams', { templateUrl: 'views/nfl/positionselect.html' })
+/*	.when('/nflteams', { templateUrl: 'views/nfl/list.html' })
 	.when('/nflteams/:nflteamId', { templateUrl: 'views/nfl/view.html' })*/
 
-    .when('/leagues', { templateUrl: 'views/leagues/positionselect.html' })
+    .when('/leagues', { templateUrl: 'views/leagues/list.html' })
     .when('/leagues/create', { templateUrl: 'views/leagues/create.html' })
 	.when('/leagues/:leagueId/edit', { templateUrl: 'views/leagues/edit.html' })
 	.when('/leagues/:leagueId', { templateUrl: 'views/leagues/view.html' })
 
-    .when('/fantasyteams', { templateUrl: 'views/fantasyteams/positionselect.html' })
+    .when('/fantasyteams', { templateUrl: 'views/fantasyteams/list.html' })
     .when('/fantasyteams/create', { templateUrl: 'views/fantasyteams/create.html' })
     .when('/fantasyteams/:fantasyteamId/edit', { templateUrl: 'views/fantasyteams/edit.html' })
     .when('/fantasyteams/:fantasyteamId', { templateUrl: 'views/fantasyteams/view.html' })
 
-    .when('/nflteams', { templateUrl: 'views/nflteams/positionselect.html' })
+    .when('/nflteams', { templateUrl: 'views/nflteams/list.html' })
     .when('/nflteams/:nflteamId', { templateUrl: 'views/nflteams/view.html' })
 
     .when('/players', { templateUrl: 'views/players/list.html'})

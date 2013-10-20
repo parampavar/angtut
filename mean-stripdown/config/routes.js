@@ -41,6 +41,11 @@ module.exports = function (app, passport, auth) {
     app.get('/playerpositions/:playerpositionsId', playerpositions.show)
     app.param('playerpositionsId', playerpositions.playerposition)
 
+    var players = require('../app/controllers/players')
+    app.get('/players', players.all)
+    app.get('/players/:playerId', players.show)
+    app.param('playerId', players.player)
+
 
     // home route
 	var index = require('../app/controllers/index')
