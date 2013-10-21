@@ -14,6 +14,7 @@
     }
   , "dependencies": {
       "express": "latest"
+    , "ng-grid": "latest"
     , "jade": "latest"
     , "mongoose": "latest"
     , "connect-mongo": "latest"

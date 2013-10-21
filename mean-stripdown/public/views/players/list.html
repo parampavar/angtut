@@ -1,8 +1,10 @@
-<div ng-controller="PlayersController" ng-init="find()">
+<div ng-controller="PlayersController">
     <input type="text" ng-model="search.firstname">
     <positions></positions>
     <nflteams></nflteams>
     <searchlimit></searchlimit>
+    <div class="gridStyle" ng-init="find()" ng-grid="gridOptions"></div>
+<!--
     <table>
         <tr ng-repeat="player in players | filter:search | limitTo:limitct">
             <td>{{ player.pos }}</td>
@@ -11,4 +13,5 @@
             <td>{{ player.lastname }}</td>
         </tr>
     </table>
+-->
 </div>
