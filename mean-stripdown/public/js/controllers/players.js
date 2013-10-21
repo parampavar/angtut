@@ -25,7 +25,6 @@ window.angular.module('ngff.controllers.players', [])
                 });
             };
 
-            $scope.limitct = 10;
             $scope.myDefs = [{ field: 'firstname', displayName: 'First Name', width: "*", resizable: false},
                 { field: 'lastname', displayName: 'Last Name', width: "*" },
                 { field: 'team', displayName: 'Team', width: "*" },
@@ -37,7 +36,7 @@ window.angular.module('ngff.controllers.players', [])
                 filterText: "",
                 useExternalFilter: true
             };
-            $scope.totalServerItems = 0;
+            $scope.totalServerItems = 100;
             $scope.pagingOptions = {
                 pageSizes: [5, 10, 20],
                 pageSize: 5,
@@ -45,8 +44,8 @@ window.angular.module('ngff.controllers.players', [])
             };
             $scope.setPagingData = function(data, page, pageSize){
                 var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
-                $scope.myData = pagedData;
-                $scope.totalServerItems = data.length;
+                $scope.playerspagedData = pagedData;
+                //$scope.totalServerItems = data.length;
                 if (!$scope.$$phase) {
                     $scope.$apply();
                 }
@@ -54,47 +53,49 @@ window.angular.module('ngff.controllers.players', [])
             $scope.getPagedDataAsync = function (pageSize, page, searchText) {
                 setTimeout(function () {
                     var data;
-                    if ($scope.players)
-                        $scope.find();
-                    else
-                        $scope.find();
                     if (searchText) {
                         var ft = searchText.toLowerCase();
-                        //$http.get('largeLoad.json').success(function (largeLoad) {
                             data = $scope.players.filter(function(item) {
                                 return JSON.stringify(item).toLowerCase().indexOf(ft) != -1;
                             });
                             $scope.setPagingData(data,page,pageSize);
-                        //});
                     } else {
-                        //$http.get('largeLoad.json').success(function (largeLoad) {
                             $scope.setPagingData($scope.players,page,pageSize);
-                        //});
                     }
                 }, 100);
             };
 
-            $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
-
             $scope.$watch('pagingOptions', function (newVal, oldVal) {
-                if (newVal !== oldVal && newVal.currentPage !== oldVal.currentPage) {
+                if (newVal !== oldVal || newVal.currentPage !== oldVal.currentPage) {
                     $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
                 }
             }, true);
-            $scope.$watch('filterOptions', function (newVal, oldVal) {
+            $scope.$watch('search.firstname', function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                }
+            }, true);
+            $scope.$watch('players', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
                     $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
                 }
             }, true);
+            $scope.$watch('search.team', function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                }
+            }, true);
 
             $scope.gridOptions = {
-                data: 'players',
+                data: 'playerspagedData',
                 enablePaging: true,
                 showFooter: true,
                 columnDefs: 'myDefs',
-                totalServerItems:'totalServerItems',
+                totalServerItems: 'totalServerItems',
                 pagingOptions: $scope.pagingOptions,
                 filterOptions: $scope.filterOptions
             };
+
+            $scope.find();
 
         }]);
