@@ -36,7 +36,7 @@ window.angular.module('ngff.controllers.players', [])
                 filterText: "",
                 useExternalFilter: true
             };
-            $scope.totalServerItems = 100;
+            $scope.totalServerItems = 0;
             $scope.pagingOptions = {
                 pageSizes: [5, 10, 20],
                 pageSize: 5,
@@ -45,7 +45,7 @@ window.angular.module('ngff.controllers.players', [])
             $scope.setPagingData = function(data, page, pageSize){
                 var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
                 $scope.playerspagedData = pagedData;
-                //$scope.totalServerItems = data.length;
+                $scope.totalServerItems = data.length;
                 if (!$scope.$$phase) {
                     $scope.$apply();
                 }
