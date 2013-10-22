@@ -1,3 +1,4 @@
-<select ng-model="search.team" required="required" ng-options="c._id as c.team for c in nflteams">
+<select ng-model="search.team" required="required">
     <option value="">All NFL teams</option>
+    <option ng-click="SelectTeamFilter(c);"  ng-repeat="c in nflteams" value="{{c.abbr}}">{{ c.team }}</option>
 </select>

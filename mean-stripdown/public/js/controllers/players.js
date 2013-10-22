@@ -32,6 +32,10 @@ window.angular.module('ngff.controllers.players', [])
                 { field: 'pos', displayName: 'Position', width: "*" }
             ];
 
+            $scope.SelectTeamFilter = function(team){
+                console.log(team.JSON);
+            };
+
             $scope.filterOptions = {
                 filterText: "",
                 useExternalFilter: true
@@ -50,12 +54,17 @@ window.angular.module('ngff.controllers.players', [])
                     $scope.$apply();
                 }
             };
-            $scope.getPagedDataAsync = function (pageSize, page, searchText) {
+            $scope.getPagedDataAsync = function (searchOption, pageSize, page, searchText) {
                 setTimeout(function () {
                     var data;
-                    if (searchText) {
+                    if (searchText && searchOption) {
                         var ft = searchText.toLowerCase();
-                            data = $scope.players.filter(function(item) {
+                        data = $scope.players.filter(function (item) {
+                            if (searchOption == 'search.team')
+                                return item.team == searchText;
+                            else if (searchOption == 'search.pos')
+                                return item.pos == searchText;
+                            else
                                 return JSON.stringify(item).toLowerCase().indexOf(ft) != -1;
                             });
                             $scope.setPagingData(data,page,pageSize);
@@ -67,22 +76,27 @@ window.angular.module('ngff.controllers.players', [])
 
             $scope.$watch('pagingOptions', function (newVal, oldVal) {
                 if (newVal !== oldVal || newVal.currentPage !== oldVal.currentPage) {
-                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+                    $scope.getPagedDataAsync('pagingOptions', $scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
                 }
             }, true);
             $scope.$watch('search.firstname', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                    $scope.getPagedDataAsync('search.firstname', $scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
                 }
             }, true);
             $scope.$watch('players', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+                    $scope.getPagedDataAsync('players', $scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
                 }
             }, true);
             $scope.$watch('search.team', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                    $scope.getPagedDataAsync('search.team', $scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                }
+            }, true);
+            $scope.$watch('search.pos', function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    $scope.getPagedDataAsync('search.pos', $scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
                 }
             }, true);
 

@@ -1,3 +1,4 @@
-<select ng-model="search.pos" required="required" ng-options="c._id as c.pos for c in playerpositions">
+<select ng-model="search.pos" required="required">
     <option value="">All positions</option>
+    <option ng-repeat="c in playerpositions" value="{{c.abbr}}">{{ c.pos }}</option>
 </select>
