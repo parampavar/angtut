@@ -86,24 +86,24 @@ window.angular.module('ngff.controllers.players', [])
                     $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
                 }
             }, true);
-            $scope.$watch('search.firstname', function (newVal, oldVal) {
-                if (newVal !== oldVal) {
-                    $scope.getPagedDataAsync( $scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
-                }
-            }, true);
             $scope.$watch('players', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
                     $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
                 }
             }, true);
+            $scope.$watch('search.firstname', function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal.toLowerCase());
+                }
+            }, true);
             $scope.$watch('search.team', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal.toLowerCase());
                 }
             }, true);
             $scope.$watch('search.pos', function (newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal);
+                    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, newVal.toLowerCase());
                 }
             }, true);
 
