@@ -3,6 +3,6 @@
     {"abbr":"RB", "pos":"Runningback"},
     {"abbr":"WR", "pos":"Wide Receiver"},
     {"abbr":"TE", "pos":"Tight End"},
-    {"abbr":"K", "pos":"Kicker"},
+    {"abbr":"KR", "pos":"Kicker"},
     {"abbr":"D/ST","pos":"Defense/Special Teams"}
 ]
