@@ -21,7 +21,6 @@ window.angular.module('ngff.controllers.players', [])
                 $scope.fnplayerpositions();
                 Players.query(query, function (players) {
                     $scope.players = players;
-                    //return players;
                 });
             };
 
@@ -40,7 +39,7 @@ window.angular.module('ngff.controllers.players', [])
                 filterText: "",
                 useExternalFilter: true
             };
-            $scope.totalServerItems = 0;
+            $scope.totalPlayers = 0;
             $scope.pagingOptions = {
                 pageSizes: [5, 10, 20],
                 pageSize: 5,
@@ -49,7 +48,7 @@ window.angular.module('ngff.controllers.players', [])
             $scope.setPagingData = function(data, page, pageSize){
                 var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
                 $scope.playerspagedData = pagedData;
-                $scope.totalServerItems = data.length;
+                $scope.totalPlayers = data.length;
                 if (!$scope.$$phase) {
                     $scope.$apply();
                 }
@@ -107,12 +106,18 @@ window.angular.module('ngff.controllers.players', [])
                 }
             }, true);
 
+            $scope.$watch('totalPlayers', function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    console.log('totalPlayers=' + newVal);
+                }
+            }, true);
+
             $scope.gridOptions = {
                 data: 'playerspagedData',
                 enablePaging: true,
                 showFooter: true,
                 columnDefs: 'myDefs',
-                totalServerItems: 'totalServerItems',
+                totalServerItems: 'totalPlayers',
                 pagingOptions: $scope.pagingOptions,
                 filterOptions: $scope.filterOptions,
 //                showColumnMenu: true,
