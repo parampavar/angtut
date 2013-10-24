@@ -114,7 +114,10 @@ window.angular.module('ngff.controllers.players', [])
                 columnDefs: 'myDefs',
                 totalServerItems: 'totalServerItems',
                 pagingOptions: $scope.pagingOptions,
-                filterOptions: $scope.filterOptions
+                filterOptions: $scope.filterOptions,
+//                showColumnMenu: true,
+//                showFilter: true,
+                showGroupPanel: true
             };
 
             $scope.find();
