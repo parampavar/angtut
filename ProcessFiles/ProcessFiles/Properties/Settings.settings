@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ProcessFiles.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MessageHost" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">tcp://localhost</Value>
+    </Setting>
+    <Setting Name="MessageHostPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">61616</Value>
+    </Setting>
+    <Setting Name="MessageQueueName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ProcessFiles</Value>
+    </Setting>
+    <Setting Name="MessageSubscriber" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ProcessFiles</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Apache.NMS</id>
+    <version>1.6.0</version>
+    <authors>Anthony S. Kilhoffer, Stephen A. Bohlen</authors>
+    <owners>Anthony S. Kilhoffer, Stephen A. Bohlen</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>http://activemq.apache.org/nms/</projectUrl>
+    <iconUrl>http://www.apache.org/images/feather-small.gif</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Allows you to build .NET applications in C#, VB, or any other .NET language, using a single API to connect to multiple different providers.</description>
+    <summary>Allows you to build .NET applications in C#, VB, or any other .NET language, using a single API to connect to multiple different providers.</summary>
+    <tags>messaging apache nms</tags>
+  </metadata>
+</package>
