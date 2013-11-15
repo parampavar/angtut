@@ -11,6 +11,7 @@ using System.Configuration;
 
 using Apache.NMS;
 using Apache.NMS.ActiveMQ;
+using System.Collections.Specialized;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
@@ -21,7 +22,7 @@ namespace ProcessFiles
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IConnection _connection;
         private ISession _session;
-        private string _QUEUE = "MY.TEST";
+        
         public Form1()
         {
             InitializeComponent();
@@ -35,37 +36,36 @@ namespace ProcessFiles
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            log.Info("Info logging");
-            IConnectionFactory factory = new ConnectionFactory(ConfigurationManager.AppSettings["MessageHost"] + ":" + ConfigurationManager.AppSettings["MessagePort"]);
+            log.Info("Connecting to " + ProcessFiles.Properties.Settings.Default.MessageHost + ":" + ProcessFiles.Properties.Settings.Default.MessageHostPort);
+            IConnectionFactory factory = new ConnectionFactory(Properties.Settings.Default.MessageHost + ":" + Properties.Settings.Default.MessageHostPort);
             _connection = factory.CreateConnection();
             _connection.Start();
             _session = _connection.CreateSession();
 
-            IDestination dest = _session.GetQueue(_QUEUE);
+            IDestination dest = _session.GetQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
             using (IMessageConsumer consumer = _session.CreateConsumer(dest))
             {
-                consumer.Listener += consumer_Listener;
+                ////Process any messages already sitting there
                 //IMessage message;
                 //while ((message = consumer.Receive(TimeSpan.FromMilliseconds(2000))) != null)
                 //{
                 //    var objectMessage = message as ITextMessage;
                 //    if (objectMessage != null)
-                //    {
-                //        objectMessage.Text = objectMessage.Text;
-                //    }
+                //        log.Info("Old Message:" + objectMessage.Text);
                 //}
+
+                //hook up the listener to process new messages
+                consumer.Listener += new MessageListener(consumer_Listener);
             }
 
         }
 
         private void consumer_Listener(IMessage message)
         {
-            MyMsg msg = null;
-            var objectMessage = message as IObjectMessage;
+            ITextMessage objectMessage = message as ITextMessage;
             if (objectMessage != null)
             {
-                msg = objectMessage as MyMsg;
-
+                log.Info(objectMessage.Text);
             }
         }
     }
