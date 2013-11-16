@@ -1,6 +1,7 @@
 package org.param.processfiles;
 
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.Timer;
 
 import javax.jms.JMSException;
@@ -15,7 +16,15 @@ public class NotifyToProcessFiles {
 	public static void main(String[] args) throws JMSException, IOException {
 		
 		System.out.println("Sending Enter 'exit' to stop");
-		/*
+		
+		Consumer c = new Consumer();
+		
+		
+		Timer timer = new Timer("Printer");
+		TimedNotifier t = new TimedNotifier();
+		timer.schedule(t, 0, 1000);
+		
+		
 		Scanner scan = new Scanner(System.in);
 		
 		boolean keepRunning = true;
@@ -31,12 +40,7 @@ public class NotifyToProcessFiles {
                 System.out.println("Hello " + name);  
             }  
         }
-        */		
-		Timer timer = new Timer("Printer");
-		TimedNotifier t = new TimedNotifier();
-		timer.schedule(t, 0, 2000);
-		
-		//console.printf(format, args)
+        
 		
 	}
 

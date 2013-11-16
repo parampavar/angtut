@@ -19,7 +19,7 @@ public class TimedNotifier extends TimerTask {
 	private int times = 0;
 	public void run()  {
 		times++;
-		if (times < 6)
+		if (times < 25)
 		{
 			
 			ConnectionFactory connectionFactory;
@@ -32,6 +32,8 @@ public class TimedNotifier extends TimerTask {
 				TextMessage message = session.createTextMessage("Hello .NET from Java count =" + times);
 				producer.send(message);
 				System.out.println("Sent message '" + message.getText() + "'");
+				session.close();
+				connection.close();
 			} catch (JMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

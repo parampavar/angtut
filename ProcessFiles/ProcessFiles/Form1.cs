@@ -46,13 +46,13 @@ namespace ProcessFiles
             using (IMessageConsumer consumer = _session.CreateConsumer(dest))
             {
                 ////Process any messages already sitting there
-                //IMessage message;
-                //while ((message = consumer.Receive(TimeSpan.FromMilliseconds(2000))) != null)
-                //{
-                //    var objectMessage = message as ITextMessage;
-                //    if (objectMessage != null)
-                //        log.Info("Old Message:" + objectMessage.Text);
-                //}
+                IMessage message;
+                while ((message = consumer.Receive(TimeSpan.FromMilliseconds(2000))) != null)
+                {
+                    var objectMessage = message as ITextMessage;
+                    if (objectMessage != null)
+                        log.Info("Old Message:" + objectMessage.Text);
+                }
 
                 //hook up the listener to process new messages
                 consumer.Listener += new MessageListener(consumer_Listener);
@@ -60,7 +60,7 @@ namespace ProcessFiles
 
         }
 
-        private void consumer_Listener(IMessage message)
+        void consumer_Listener(IMessage message)
         {
             ITextMessage objectMessage = message as ITextMessage;
             if (objectMessage != null)
