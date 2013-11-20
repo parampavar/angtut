@@ -32,6 +32,7 @@ public class TimedNotifier extends TimerTask {
 				TextMessage message = session.createTextMessage("Hello .NET from Java count =" + times);
 				producer.send(message);
 				System.out.println("Sent message '" + message.getText() + "'");
+				producer.close();
 				session.close();
 				connection.close();
 			} catch (JMSException e) {

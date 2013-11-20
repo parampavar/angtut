@@ -18,6 +18,7 @@ public class NotifyToProcessFiles {
 		System.out.println("Sending Enter 'exit' to stop");
 		
 		Consumer c = new Consumer();
+		System.out.println(Consumer.destination.toString());
 		
 		
 		Timer timer = new Timer("Printer");
@@ -40,6 +41,7 @@ public class NotifyToProcessFiles {
                 System.out.println("Hello " + name);  
             }  
         }
+        System.out.println("Exiting.... ");  
         
 		
 	}

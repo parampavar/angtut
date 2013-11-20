@@ -17,7 +17,9 @@ public class Consumer  {
 	private static ActiveMQConnectionFactory connectionFactory;
 	private static Connection connection;
 	private static Session session;
-	private static Destination destination;
+	public static Destination destination;
+	private static MessageConsumer consumer;
+	private static MyConsumer myConsumer;
 	
 	public Consumer(){
 		
@@ -26,9 +28,10 @@ public class Consumer  {
 			connection = connectionFactory.createConnection();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			destination = session.createQueue(MessageQueueName);
-			MessageConsumer consumer = session.createConsumer(destination);
-			MyConsumer myConsumer = new MyConsumer();
+			consumer = session.createConsumer(destination);
+			myConsumer = new MyConsumer();
 			consumer.setMessageListener(myConsumer);
+			System.out.println("inside Consumer");
 		}
 		catch (Exception e)
 		{
@@ -45,10 +48,11 @@ public class Consumer  {
 	    }
 
 	    public void onMessage(Message message) {
+	    	System.out.println("inside onMessage");
 	        if (message instanceof TextMessage) {
 	            TextMessage textMessage = (TextMessage) message;
 	            try {
-	                System.out.println("Received message: " + textMessage.getText());
+	                System.out.println("Received message JAVA: " + textMessage.getText());
 	            } catch (JMSException ex) {
 	                System.out.println("Error reading message: " + ex);
 	            }
