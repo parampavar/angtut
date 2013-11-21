@@ -50,24 +50,6 @@ namespace ProcessFiles
             _connection.Start();
             _session = _connection.CreateSession();
             log.Info("Session Created");
-
-            ActiveMQQueue topic = new ActiveMQQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
-
-            log.Info("Connected to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-
-            try
-            {
-                _consumer = _session.CreateConsumer(topic);
-                log.Info("Created a Consumer to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-                _consumer.Listener += new MessageListener(consumer_Listener);
-
-                log.Info("Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-                log.Info("Finished Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-            }
-            finally
-            {
-
-            }
         }
 
         public void consumer_Listener(IMessage message)
@@ -90,6 +72,28 @@ namespace ProcessFiles
                 var objectMessage = producer.CreateTextMessage("Hello message from .NET count =" + i.ToString());
                 producer.Send(objectMessage);
                 }
+            }
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ActiveMQQueue topic = new ActiveMQQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
+
+            log.Info("Connected to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+
+            try
+            {
+                _consumer = _session.CreateConsumer(topic);
+                log.Info("Created a Consumer to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+                _consumer.Listener += new MessageListener(consumer_Listener);
+
+                log.Info("Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+                log.Info("Finished Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+            }
+            finally
+            {
+
             }
 
         }

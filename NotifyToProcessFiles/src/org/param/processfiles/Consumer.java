@@ -7,6 +7,8 @@ import javax.jms.*;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQMessageConsumer;
+import org.apache.activemq.command.ActiveMQQueue;
 
 public class Consumer  {
 	private static String MessageHost = "tcp://localhost";
@@ -14,24 +16,41 @@ public class Consumer  {
 	private static String MessageQueueName = "ProcessFiles";
 	private static String MessagePublisher = "NotifyToProcessFiles";
 	
-	private static ActiveMQConnectionFactory connectionFactory;
-	private static Connection connection;
-	private static Session session;
-	public static Destination destination;
-	private static MessageConsumer consumer;
-	private static MyConsumer myConsumer;
+	private static ActiveMQConnectionFactory _connectionFactory;
+	private static Connection _connection;
+	private static Session _session;
+	public static MessageConsumer _consumer;
+
 	
 	public Consumer(){
 		
 		try {
-			connectionFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));
-			connection = connectionFactory.createConnection();
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createQueue(MessageQueueName);
-			consumer = session.createConsumer(destination);
-			myConsumer = new MyConsumer();
-			consumer.setMessageListener(myConsumer);
+			_connectionFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));
+			_connection = _connectionFactory.createConnection();
+			_connection.start();
+			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			System.out.println("inside Consumer");
+			System.out.println("Session created");
+
+			ActiveMQQueue topic = new ActiveMQQueue(MessageQueueName);
+			System.out.println("Connected to Queue.");
+
+			_consumer = _session.createConsumer(topic);
+			_consumer.setMessageListener(new MessageListener() {
+				
+				public void onMessage(Message message) {
+			        if (message instanceof TextMessage) {
+			            TextMessage textMessage = (TextMessage) message;
+			            try {
+			                System.out.println("Received message JAVA: " + textMessage.getText());
+			            } catch (JMSException ex) {
+			                System.out.println("Error reading message: " + ex);
+			            }
+			        } else  {
+			            System.out.println("Received: " + message);
+			        }
+				}
+			});
 		}
 		catch (Exception e)
 		{
@@ -40,7 +59,7 @@ public class Consumer  {
 		
 	}
 	
-	private static class MyConsumer implements MessageListener, ExceptionListener {
+/*	private static class MyConsumer implements MessageListener, ExceptionListener {
 
 	    synchronized public void onException(JMSException ex) {
 	        System.out.println("JMS Exception occured.  Shutting down client.");
@@ -61,4 +80,5 @@ public class Consumer  {
 	        }
 	    }
 	}
+*/
 }
