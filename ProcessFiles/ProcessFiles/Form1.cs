@@ -57,7 +57,7 @@ namespace ProcessFiles
 
             try
             {
-                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhast", 5673,
+                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhost", 5672,
                        Properties.Settings.Default.MessageQueueName, "guest", "guest", 10,
                        x => x.Register<EasyNetQ.IEasyNetQLogger>(_ => new EasyNetLogger()));
             }
