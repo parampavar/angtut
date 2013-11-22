@@ -25,9 +25,11 @@ namespace ProcessFiles
         private IConnectionFactory _factory;
         private IConnection _connection;
         private ISession _session;
-        private QueueConsumer qc;
-        private QueueProducer qp;
-        
+        private ActiveConsumer qc;
+        private ActiveProducer qp;
+
+        private EasyNetQ.IBus _rabbitBus;
+
         public Form1()
         {
             InitializeComponent();
@@ -52,10 +54,19 @@ namespace ProcessFiles
             _connection.Start();
             _session = _connection.CreateSession();
             log.Debug("Session Created.");
+
+            try
+            {
+                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhast", 5673,
+                       Properties.Settings.Default.MessageQueueName, "guest", "guest", 10,
+                       x => x.Register<EasyNetQ.IEasyNetQLogger>(_ => new EasyNetLogger()));
+            }
+            catch (Exception ex)
+            {
+                
+                throw;
+            }
         }
-
-
-
 
         private void receiveMessages_Click(object sender, EventArgs e)
         {
@@ -76,12 +87,37 @@ namespace ProcessFiles
             //{
 
             //}
-            qc = new QueueConsumer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+            qc = new ActiveConsumer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
         }
 
         private void sendMessages_Click(object sender, EventArgs e)
         {
-            qp = new QueueProducer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+            qp = new ActiveProducer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+        }
+    }
+
+    public class EasyNetLogger : EasyNetQ.IEasyNetQLogger
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public void DebugWrite(string format, params object[] args)
+        {
+            log.Debug(String.Format(format, args));
+        }
+
+        public void ErrorWrite(Exception exception)
+        {
+            log.Error(null, exception);
+        }
+
+        public void ErrorWrite(string format, params object[] args)
+        {
+            log.ErrorFormat(format, args);
+        }
+
+        public void InfoWrite(string format, params object[] args)
+        {
+            log.InfoFormat(format, args);
         }
     }
 }

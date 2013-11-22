@@ -9,12 +9,12 @@ using Apache.NMS.ActiveMQ.Commands;
 
 namespace ProcessFiles
 {
-    class QueueConsumer : IDisposable
+    class ActiveConsumer : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IMessageConsumer _consumer;
 
-        public QueueConsumer(IConnection connection, ISession session, String QueueName)
+        public ActiveConsumer(IConnection connection, ISession session, String QueueName)
         {
             log.Debug("Connecting to MessageQueue...");
 

@@ -10,13 +10,13 @@ using Apache.NMS.ActiveMQ.Commands;
 
 namespace ProcessFiles
 {
-    class QueueProducer : IDisposable
+    class ActiveProducer : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         IMessageProducer _producer;
         Timer _timProducer;
         Int32 countOfMessages;
-        public QueueProducer(IConnection connection, ISession session, String QueueName)
+        public ActiveProducer(IConnection connection, ISession session, String QueueName)
         {
             log.Debug("Connecting to MessageQueue...");
 
