@@ -49,8 +49,8 @@ public class NotifyToProcessFiles {
 	        System.out.println("Exception occured.  Shutting down client.");
 		}
 		
-		//qc = new QueueConsumer();
 		qp = new QueueProducer(_connection, _session, MessageQueueName);
+		qc = new QueueConsumer(_connection, _session, MessageQueueName);
 		
 		System.out.println("Type 'exit' to stop.");
 		

@@ -31,9 +31,10 @@ public class QueueProducer {
 			public void run() {
 	            countOfMessages++;
 	            TextMessage message;
-	            System.out.println("sending messages...");
+	            
 	            try 
 				{
+	            	System.out.println("Hello from JAVA count =" + countOfMessages);
 					message = _session.createTextMessage("Hello from JAVA count =" + countOfMessages);
 		            _producer.send(message);
 				} catch (JMSException e) 
