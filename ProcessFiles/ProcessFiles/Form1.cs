@@ -22,9 +22,11 @@ namespace ProcessFiles
     public partial class Form1 : Form
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private IConnectionFactory _factory;
         private IConnection _connection;
         private ISession _session;
-        private IMessageConsumer _consumer;
+        private QueueConsumer qc;
+        private QueueProducer qp;
         
         public Form1()
         {
@@ -33,7 +35,7 @@ namespace ProcessFiles
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if ( _connection != null)
+            if (_connection != null)
                 _connection.Close();
             if (_session != null)
                 _session.Close();
@@ -43,59 +45,43 @@ namespace ProcessFiles
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            log.Info("Connecting to " + ProcessFiles.Properties.Settings.Default.MessageHost + ":" + ProcessFiles.Properties.Settings.Default.MessageHostPort);
             IConnectionFactory factory = new ConnectionFactory(Properties.Settings.Default.MessageHost + ":" + Properties.Settings.Default.MessageHostPort);
-            
+
             _connection = factory.CreateConnection();
+            _connection.ClientId = ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET";
             _connection.Start();
             _session = _connection.CreateSession();
-            log.Info("Session Created");
+            log.Debug("Session Created.");
         }
 
-        public void consumer_Listener(IMessage message)
+
+
+
+        private void receiveMessages_Click(object sender, EventArgs e)
         {
-            log.Info("Inside listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "', receiving messages.");
-            ITextMessage objectMessage = message as ITextMessage;
-            if (objectMessage != null)
-            {
-                log.Info(objectMessage.Text);
-            }
+            //ActiveMQQueue topic = new ActiveMQQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
+
+            //log.Info("Connected to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+
+            //try
+            //{
+            //    _consumer = _session.CreateConsumer(topic);
+            //    log.Info("Created a Consumer to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+            //    _consumer.Listener += new MessageListener(consumer_Listener);
+
+            //    log.Info("Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+            //    log.Info("Finished Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
+            //}
+            //finally
+            //{
+
+            //}
+            qc = new QueueConsumer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void sendMessages_Click(object sender, EventArgs e)
         {
-            ActiveMQQueue topic = new ActiveMQQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
-            using (IMessageProducer producer = _session.CreateProducer(topic))
-            {
-                for(int i = 0; i < 25; i++)
-                {
-                var objectMessage = producer.CreateTextMessage("Hello message from .NET count =" + i.ToString());
-                producer.Send(objectMessage);
-                }
-            }
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            ActiveMQQueue topic = new ActiveMQQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
-
-            log.Info("Connected to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-
-            try
-            {
-                _consumer = _session.CreateConsumer(topic);
-                log.Info("Created a Consumer to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-                _consumer.Listener += new MessageListener(consumer_Listener);
-
-                log.Info("Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-                log.Info("Finished Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-            }
-            finally
-            {
-
-            }
-
+            qp = new QueueProducer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
         }
     }
 }

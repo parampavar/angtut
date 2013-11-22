@@ -10,7 +10,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQMessageConsumer;
 import org.apache.activemq.command.ActiveMQQueue;
 
-public class Consumer  {
+public class QueueConsumer  {
 	private static String MessageHost = "tcp://localhost";
 	private static String MessageHostPort = "61616";
 	private static String MessageQueueName = "ProcessFiles";
@@ -22,7 +22,7 @@ public class Consumer  {
 	public static MessageConsumer _consumer;
 
 	
-	public Consumer(){
+	public QueueConsumer(){
 		
 		try {
 			_connectionFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));

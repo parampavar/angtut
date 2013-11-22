@@ -19,7 +19,7 @@ import org.apache.activemq.command.ActiveMQQueue;
 
 public class NotifyToProcessFiles {
 
-/*	private static String MessageHost = "tcp://localhost";
+	private static String MessageHost = "tcp://localhost";
 	private static String MessageHostPort = "61616";
 	private static String MessageQueueName = "ProcessFiles";
 	private static String MessagePublisher = "NotifyToProcessFiles";
@@ -27,15 +27,32 @@ public class NotifyToProcessFiles {
 	private static ActiveMQConnectionFactory _connectionFactory;
 	private static Connection _connection;
 	private static Session _session;
-	public static MessageConsumer _consumer;*/
+	private static QueueConsumer qc;
+	private static QueueProducer qp;
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws JMSException, IOException {
+
+		try 
+		{
+			_connectionFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));
+			_connection = _connectionFactory.createConnection();
+			_connection.start();
+			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			System.out.println("Session created");
+		}
+		catch (Exception e)
+		{
+	        System.out.println("Exception occured.  Shutting down client.");
+		}
 		
-		System.out.println("Sending Enter 'exit' to stop");
+		//qc = new QueueConsumer();
+		qp = new QueueProducer(_connection, _session, MessageQueueName);
+		
+		System.out.println("Type 'exit' to stop.");
 		
 		
 /*		try {
@@ -72,13 +89,13 @@ public class NotifyToProcessFiles {
 		
 		
 		
-		Consumer c = new Consumer();
+		//Consumer c = new Consumer();
 				
 		
-		Timer timer = new Timer("Printer");
-		TimedNotifier t = new TimedNotifier();
+/*		Timer timer = new Timer("Printer");
+		QueueProducer t = new QueueProducer();
 		timer.schedule(t, 0, 1000);
-		
+		*/
 		
 		Scanner scan = new Scanner(System.in);
 		
