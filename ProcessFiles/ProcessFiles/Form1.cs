@@ -22,11 +22,11 @@ namespace ProcessFiles
     public partial class Form1 : Form
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private IConnectionFactory _factory;
-        private IConnection _connection;
-        private ISession _session;
-        private ActiveConsumer qc;
-        private ActiveProducer qp;
+        private IConnectionFactory _amqfactory;
+        private IConnection _amqconnection;
+        private ISession _amqsession;
+        private ActiveConsumer amqConsumer;
+        private ActiveProducer amqProducer;
 
         private EasyNetQ.IBus _rabbitBus;
 
@@ -37,34 +37,49 @@ namespace ProcessFiles
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_connection != null)
-                _connection.Close();
-            if (_session != null)
-                _session.Close();
-            if (_connection != null)
-                _connection.Close();
+            if (_amqconnection != null)
+                _amqconnection.Close();
+            if (_amqsession != null)
+                _amqsession.Close();
+            if (_amqconnection != null)
+                _amqconnection.Close();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             IConnectionFactory factory = new ConnectionFactory(Properties.Settings.Default.MessageHost + ":" + Properties.Settings.Default.MessageHostPort);
 
-            _connection = factory.CreateConnection();
-            _connection.ClientId = ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET";
-            _connection.Start();
-            _session = _connection.CreateSession();
+            _amqconnection = factory.CreateConnection();
+            _amqconnection.ClientId = ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET";
+            _amqconnection.Start();
+            _amqsession = _amqconnection.CreateSession();
             log.Debug("Session Created.");
 
             try
             {
-                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhost", 5672,
-                       Properties.Settings.Default.MessageQueueName, "guest", "guest", 10,
-                       x => x.Register<EasyNetQ.IEasyNetQLogger>(_ => new EasyNetLogger()));
+                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("host=localhost:5672");
+                //_rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhost", 5672,
+                //       Properties.Settings.Default.MessageQueueName, "guest", "guest", 10,
+                //       x => x.Register<EasyNetQ.IEasyNetQLogger>(_ => new EasyNetLogger()));
+
+//                _rabbitBus.Subscribe<MyMsg>(ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET", message => { log.Info(message.Text); log.Debug(message.Text); });
+                _rabbitBus.Subscribe<MyMsg>(ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET", onRabbitMQMesage);
+                _rabbitBus.Publish<MyMsg>(new MyMsg("RabbitMQ msg from .NET"));
             }
             catch (Exception ex)
             {
                 
                 throw;
+            }
+        }
+
+        private void onRabbitMQMesage(MyMsg obj)
+        {
+            log.Debug("Inside RavvitMQ listener event.");
+            if (obj != null)
+            {
+                log.Info(obj.Text);
+                log.Debug(obj.Text);
             }
         }
 
@@ -87,12 +102,12 @@ namespace ProcessFiles
             //{
 
             //}
-            qc = new ActiveConsumer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+            amqConsumer = new ActiveConsumer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName);
         }
 
         private void sendMessages_Click(object sender, EventArgs e)
         {
-            qp = new ActiveProducer(_connection, _session, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName);
         }
     }
 
@@ -118,6 +133,22 @@ namespace ProcessFiles
         public void InfoWrite(string format, params object[] args)
         {
             log.InfoFormat(format, args);
+        }
+    }
+
+    public class MyMsg
+    {
+        private string _Text;
+
+        public string Text
+        {
+            get { return _Text; }
+            set { _Text = value; }
+        }
+
+        public MyMsg(string Text)
+        {
+            this.Text = Text;
         }
     }
 }

@@ -12,22 +12,22 @@ namespace ProcessFiles
     class ActiveConsumer : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private IMessageConsumer _consumer;
+        private IMessageConsumer _amqConsumer;
 
-        public ActiveConsumer(IConnection connection, ISession session, String QueueName)
+        public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName)
         {
             log.Debug("Connecting to MessageQueue...");
 
-            ActiveMQQueue topic = new ActiveMQQueue(QueueName);
+            ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
 
-            log.Info("Connected to Queue '" + QueueName + "'");
+            log.Info("Connected to Queue '" + amqQueueName + "'");
 
             try
             {
-                _consumer = session.CreateConsumer(topic);
-                log.Debug("Created a Consumer to Queue '" + QueueName + "'");
-                _consumer.Listener +=_consumer_Listener;
-                log.Debug("Finished Hooking up a listener to Queue '" + QueueName + "'");
+                _amqConsumer = amqSession.CreateConsumer(topic);
+                log.Debug("Created a Consumer to Queue '" + amqQueueName + "'");
+                _amqConsumer.Listener +=_amqConsumer_Listener;
+                log.Debug("Finished Hooking up a listener to Queue '" + amqQueueName + "'");
             }
             catch(Exception e)
             {
@@ -40,7 +40,7 @@ namespace ProcessFiles
             }
         }
 
-        private void _consumer_Listener(IMessage message)
+        private void _amqConsumer_Listener(IMessage message)
         {
             log.Debug("Inside listener event.");
             ITextMessage objectMessage = message as ITextMessage;
