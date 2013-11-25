@@ -29,6 +29,7 @@ namespace ProcessFiles
         private ActiveProducer amqProducer;
 
         private EasyNetQ.IBus _rabbitBus;
+        private System.Timers.Timer _timRabbitMQProducer;
 
         public Form1()
         {
@@ -43,17 +44,19 @@ namespace ProcessFiles
                 _amqsession.Close();
             if (_amqconnection != null)
                 _amqconnection.Close();
+            if (_rabbitBus != null)
+                _rabbitBus.Dispose();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            IConnectionFactory factory = new ConnectionFactory(Properties.Settings.Default.MessageHost + ":" + Properties.Settings.Default.MessageHostPort);
+            //IConnectionFactory factory = new ConnectionFactory(Properties.Settings.Default.MessageHost + ":" + Properties.Settings.Default.MessageHostPort);
 
-            _amqconnection = factory.CreateConnection();
-            _amqconnection.ClientId = ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET";
-            _amqconnection.Start();
-            _amqsession = _amqconnection.CreateSession();
-            log.Debug("Session Created.");
+            //_amqconnection = factory.CreateConnection();
+            //_amqconnection.ClientId = ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET";
+            //_amqconnection.Start();
+            //_amqsession = _amqconnection.CreateSession();
+            //log.Debug("Session Created.");
 
             try
             {
@@ -63,8 +66,10 @@ namespace ProcessFiles
                 //       x => x.Register<EasyNetQ.IEasyNetQLogger>(_ => new EasyNetLogger()));
 
 //                _rabbitBus.Subscribe<MyMsg>(ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET", message => { log.Info(message.Text); log.Debug(message.Text); });
-                _rabbitBus.Subscribe<MyMsg>(ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET", onRabbitMQMesage);
-                _rabbitBus.Publish<MyMsg>(new MyMsg("RabbitMQ msg from .NET"));
+                _rabbitBus.Subscribe<CorpMessage>(ProcessFiles.Properties.Settings.Default.MessageQueueName + ".NET", onRabbitMQMesage);
+                _timRabbitMQProducer = new System.Timers.Timer(2000);
+                _timRabbitMQProducer.Elapsed += _timRabbitMQProducer_Elapsed;
+                _timRabbitMQProducer.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -73,7 +78,14 @@ namespace ProcessFiles
             }
         }
 
-        private void onRabbitMQMesage(MyMsg obj)
+        void _timRabbitMQProducer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            CorpMessage message = new CorpMessage();
+            message.Text = "RabbitMQ msg from .NET count";
+            _rabbitBus.Publish<CorpMessage>(message);
+        }
+
+        private void onRabbitMQMesage(CorpMessage obj)
         {
             log.Debug("Inside RavvitMQ listener event.");
             if (obj != null)
@@ -85,31 +97,15 @@ namespace ProcessFiles
 
         private void receiveMessages_Click(object sender, EventArgs e)
         {
-            //ActiveMQQueue topic = new ActiveMQQueue(ProcessFiles.Properties.Settings.Default.MessageQueueName);
-
-            //log.Info("Connected to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-
-            //try
-            //{
-            //    _consumer = _session.CreateConsumer(topic);
-            //    log.Info("Created a Consumer to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-            //    _consumer.Listener += new MessageListener(consumer_Listener);
-
-            //    log.Info("Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-            //    log.Info("Finished Hooking up a listener to Queue '" + ProcessFiles.Properties.Settings.Default.MessageQueueName + "'");
-            //}
-            //finally
-            //{
-
-            //}
-            amqConsumer = new ActiveConsumer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+            amqConsumer = new ActiveConsumer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName, _rabbitBus);
         }
 
         private void sendMessages_Click(object sender, EventArgs e)
         {
-            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName);
+            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName, _rabbitBus);
         }
     }
+
 
     public class EasyNetLogger : EasyNetQ.IEasyNetQLogger
     {
@@ -136,19 +132,4 @@ namespace ProcessFiles
         }
     }
 
-    public class MyMsg
-    {
-        private string _Text;
-
-        public string Text
-        {
-            get { return _Text; }
-            set { _Text = value; }
-        }
-
-        public MyMsg(string Text)
-        {
-            this.Text = Text;
-        }
-    }
 }
