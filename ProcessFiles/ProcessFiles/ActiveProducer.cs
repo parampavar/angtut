@@ -21,7 +21,6 @@ namespace ProcessFiles
         public ActiveProducer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus)
         {
             _rabbitBus = rabbitBus;
-            log.Debug("Connecting to MessageQueue...");
 
             ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
             _amqProducer = amqSession.CreateProducer(topic);
@@ -29,19 +28,20 @@ namespace ProcessFiles
             _timProducer = new Timer(2000);
             _timProducer.Elapsed += _timProducer_Elapsed;
             _timProducer.Enabled = true;
-            log.Info("Connected to Queue '" + amqQueueName + "'");
+            log.Info("Producer Connected to Queue '" + amqQueueName + "'");
         }
 
         void _timProducer_Elapsed(object sender, ElapsedEventArgs e)
         {
             countOfMessages++;
             string msg = "Hello from .NET count =" + countOfMessages.ToString() +"'";
-            log.Debug("Sending message '" + msg);
-            CorpMessage message = new CorpMessage();
-            message.Text = msg;
-            var objectMessage = _amqProducer.CreateObjectMessage(msg);
+            var corpmessage = new CorpMessage();
+            corpmessage.Text = msg;
+            corpmessage.Subject = countOfMessages.ToString();
+            log.Debug("Sending message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
+            var objectMessage = _amqProducer.CreateObjectMessage(corpmessage);
             _amqProducer.Send(objectMessage);
-            _rabbitBus.Publish<CorpMessage>(message);
+            _rabbitBus.Publish<CorpMessage>(corpmessage);
 
         }
 

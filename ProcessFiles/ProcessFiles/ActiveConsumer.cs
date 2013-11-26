@@ -17,23 +17,17 @@ namespace ProcessFiles
 
         public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus)
         {
-            log.Debug("Connecting to MessageQueue...");
-
-            _rabbitBus = rabbitBus;
-
-            ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
-
-            log.Info("Connected to Queue '" + amqQueueName + "'");
-
             try
             {
+                _rabbitBus = rabbitBus;
+                ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
+
                 _amqConsumer = amqSession.CreateConsumer(topic);
-                log.Debug("Created a Consumer to Queue '" + amqQueueName + "'");
                 _amqConsumer.Listener +=_amqConsumer_Listener;
-                log.Debug("Finished Hooking up a listener to Queue '" + amqQueueName + "'");
 
                _rabbitBus.Subscribe<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
 
+               log.Info("Consumer Connected to Queue '" + amqQueueName + "'");
             }
             catch(Exception e)
             {
@@ -48,22 +42,21 @@ namespace ProcessFiles
 
         private void _amqConsumer_Listener(IMessage message)
         {
-            log.Debug("Inside listener event.");
-            CorpMessage objectMessage = message as CorpMessage;
+            //log.Debug("Inside listener event.");
+            var objectMessage = message as IObjectMessage;
+
             if (objectMessage != null)
             {
-                log.Info(objectMessage.Text);
-                log.Debug(objectMessage.Text);
+                CorpMessage corpmessage = objectMessage.Body as CorpMessage;
+                if ( corpmessage != null )
+                    log.Info("ActiveMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
             }
         }
-        private void _rabbitMQConsumer_Listener(CorpMessage obj)
+        private void _rabbitMQConsumer_Listener(CorpMessage corpmessage)
         {
-            log.Debug("Inside RabbiitMQ listener event.");
-            if (obj != null)
-            {
-                log.Info(obj.Text);
-                log.Debug(obj.Text);
-            }
+            //log.Debug("Inside RabbiitMQ listener event.");
+            if (corpmessage != null)
+                log.Info("RabbiitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
         }
 
         public void Dispose()
