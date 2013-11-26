@@ -17,8 +17,9 @@ namespace ProcessFiles
 
         public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus)
         {
-            _rabbitBus = rabbitBus;
             log.Debug("Connecting to MessageQueue...");
+
+            _rabbitBus = rabbitBus;
 
             ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
 
@@ -31,8 +32,7 @@ namespace ProcessFiles
                 _amqConsumer.Listener +=_amqConsumer_Listener;
                 log.Debug("Finished Hooking up a listener to Queue '" + amqQueueName + "'");
 
-               // _rabbitBus.Subscribe<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
-               // _rabbitBus.Receive<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
+               _rabbitBus.Subscribe<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
 
             }
             catch(Exception e)

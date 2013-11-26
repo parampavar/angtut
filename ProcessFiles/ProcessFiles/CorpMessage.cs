@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFiles
 {
-    class CorpMessage
+    public class CorpMessage
     {
         private string _text;
 

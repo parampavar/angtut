@@ -41,7 +41,7 @@ namespace ProcessFiles
             message.Text = msg;
             var objectMessage = _amqProducer.CreateObjectMessage(msg);
             _amqProducer.Send(objectMessage);
-            //_rabbitBus.Publish<CorpMessage>(message);
+            _rabbitBus.Publish<CorpMessage>(message);
 
         }
 
