@@ -1,5 +1,6 @@
 package org.param.processfiles;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Timer;
@@ -13,39 +14,59 @@ import org.apache.activemq.command.ActiveMQQueue;
 
 public class QueueProducer {
 
-	Session _session;
-	MessageProducer _producer;	
-	Timer _timProducer;
+	private static Session _amqSession;
+	private static MessageProducer _amqProducer;	
+	private static Timer _timProducer;
 	private int countOfMessages = 0;
 	
-	public QueueProducer(Connection connection, Session session, String queueName) throws JMSException
+	public QueueProducer(Connection amqConnection, Session amqSession, String queueName) throws JMSException
 	{
-		System.out.println("Connecting to MessageQueue...");
         ActiveMQQueue topic = new ActiveMQQueue(queueName);
-        _session = session;
-        _producer = _session.createProducer(topic);
+        _amqSession = amqSession;
+        _amqProducer = _amqSession.createProducer(topic);
         countOfMessages = 0;
         _timProducer = new Timer();
         _timProducer.schedule(new TimerTask() {
 			
 			public void run() {
 	            countOfMessages++;
+	            try 
+				{
+	            	String msg = "Hello from .JAVA count =" + Integer.toString(countOfMessages) + "'";
+		            CorpMessage corpmessage = new CorpMessage();
+		            corpmessage.set_text(msg);
+		            corpmessage.set_subject(Integer.toString(countOfMessages));
+	            	
+	            	System.out.println(msg);
+	            	ObjectMessage message;
+					message = _amqSession.createObjectMessage(corpmessage);
+		            _amqProducer.send(message);
+				} 
+	            catch (JMSException e) 
+				{
+					System.out.println("errrrr messages...");
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+/*	            
 	            TextMessage message;
 	            
 	            try 
 				{
 	            	System.out.println("Hello from JAVA count =" + countOfMessages);
-					message = _session.createTextMessage("Hello from JAVA count =" + countOfMessages);
-		            _producer.send(message);
+					message = _amqSession.createTextMessage("Hello from JAVA count =" + countOfMessages);
+		            _amqProducer.send(message);
 				} catch (JMSException e) 
 				{
 					System.out.println("errrrr messages...");
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+*/				
 			}
 		}, 0, 2000);
 		
+		System.out.println("Producer Connected to Queue '" + queueName + "'");
 	}
 	
 

@@ -13,19 +13,23 @@ namespace ProcessFiles
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IMessageConsumer _amqConsumer;
-        private EasyNetQ.IBus _rabbitBus;
-
-        public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus)
+        private EasyNetQ.IAdvancedBus _rabbitBus;
+        private EasyNetQ.Topology.IQueue _rabbitQueue;
+        private EasyNetQ.Topology.IExchange _rabbitExchange;
+        public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IAdvancedBus rabbitBus, EasyNetQ.Topology.IQueue rabbitQueue, EasyNetQ.Topology.IExchange rabbitExchange)
         {
             try
             {
                 _rabbitBus = rabbitBus;
+                _rabbitExchange = rabbitExchange;
+                _rabbitQueue = rabbitQueue;
                 ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
 
                 _amqConsumer = amqSession.CreateConsumer(topic);
                 _amqConsumer.Listener +=_amqConsumer_Listener;
 
-               _rabbitBus.Subscribe<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
+               //_rabbitBus.Subscribe<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
+                _rabbitBus.Consume<CorpMessage>(_rabbitQueue, _rabbitMQABConsumer_Listener);
 
                log.Info("Consumer Connected to Queue '" + amqQueueName + "'");
             }
@@ -38,6 +42,12 @@ namespace ProcessFiles
             {
 
             }
+        }
+
+        private Task _rabbitMQABConsumer_Listener(EasyNetQ.IMessage<CorpMessage> corpmessage, EasyNetQ.MessageReceivedInfo arg2)
+        {
+            if (corpmessage != null)
+                log.Info("RabbiitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
         }
 
         private void _amqConsumer_Listener(IMessage message)

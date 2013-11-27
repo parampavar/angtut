@@ -16,6 +16,9 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConnectionFactory;
 
 public class NotifyToProcessFiles {
 
@@ -24,11 +27,11 @@ public class NotifyToProcessFiles {
 	private static String MessageQueueName = "ProcessFiles";
 	private static String MessagePublisher = "NotifyToProcessFiles";
 	
-	private static ActiveMQConnectionFactory _connectionFactory;
-	private static Connection _connection;
-	private static Session _session;
-	private static QueueConsumer qc;
-	private static QueueProducer qp;
+	private static ActiveMQConnectionFactory _amqFactory;
+	private static Connection _amqconnection;
+	private static Session _amqsession;
+	private static QueueConsumer amqConsumer;
+	private static QueueProducer amqProducer;
 
 	/**
 	 * @param args
@@ -38,19 +41,28 @@ public class NotifyToProcessFiles {
 
 		try 
 		{
-			_connectionFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));
-			_connection = _connectionFactory.createConnection();
-			_connection.start();
-			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			_amqFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));
+			_amqconnection = _amqFactory.createConnection();
+			_amqconnection.start();
+			_amqsession = _amqconnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			System.out.println("Session created");
+			
+			
+			ConnectionFactory factory = new ConnectionFactory();
+			factory.setUsername("guest");
+			factory.setPassword("guest");
+			factory.setVirtualHost("\\");
+			factory.setHost("localhost");
+			factory.setPort(5672);
+			com.rabbitmq.client.Connection conn = factory.newConnection();
 		}
 		catch (Exception e)
 		{
 	        System.out.println("Exception occured.  Shutting down client.");
 		}
 		
-		qp = new QueueProducer(_connection, _session, MessageQueueName);
-		qc = new QueueConsumer(_connection, _session, MessageQueueName);
+		amqProducer = new QueueProducer(_amqconnection, _amqsession, MessageQueueName);
+		amqConsumer = new QueueConsumer(_amqconnection, _amqsession, MessageQueueName);
 		
 		System.out.println("Type 'exit' to stop.");
 		

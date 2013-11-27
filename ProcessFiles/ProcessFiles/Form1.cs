@@ -28,7 +28,9 @@ namespace ProcessFiles
         private ActiveConsumer amqConsumer;
         private ActiveProducer amqProducer;
 
-        private EasyNetQ.IBus _rabbitBus;
+        private EasyNetQ.IAdvancedBus _rabbitBus;
+        private EasyNetQ.Topology.IQueue _rabbitQueue;
+        private EasyNetQ.Topology.IExchange _rabbitExchange;
 
         public Form1()
         {
@@ -60,7 +62,11 @@ namespace ProcessFiles
                 _amqsession = _amqconnection.CreateSession();
                 log.Debug("ActiveMQ Session Created.");
 
-                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("host=localhost:5672");
+                _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("host=localhost:5672").Advanced;
+                _rabbitQueue = _rabbitBus.QueueDeclare(ProcessFiles.Properties.Settings.Default.MessageQueueName);
+                _rabbitExchange = _rabbitBus.ExchangeDeclare(ProcessFiles.Properties.Settings.Default.MessageQueueName, EasyNetQ.Topology.ExchangeType.Direct);
+                _rabbitBus.Bind(_rabbitExchange, _rabbitQueue, "*");
+
                 log.Debug("RabbitMQ Session Created.");
                 //_rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhost", 5672,
                 //       Properties.Settings.Default.MessageQueueName, "guest", "guest", 10,
@@ -97,7 +103,7 @@ namespace ProcessFiles
 
         private void sendMessages_Click(object sender, EventArgs e)
         {
-            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName, _rabbitBus);
+            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName, _rabbitBus, _rabbitQueue, _rabbitExchange);
         }
     }
 

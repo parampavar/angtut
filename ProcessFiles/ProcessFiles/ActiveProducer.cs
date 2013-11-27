@@ -13,14 +13,18 @@ namespace ProcessFiles
     class ActiveProducer : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        IMessageProducer _amqProducer;
-        EasyNetQ.IBus _rabbitBus;
+        private IMessageProducer _amqProducer;
+        private EasyNetQ.IAdvancedBus _rabbitBus;
+        private EasyNetQ.Topology.IQueue _rabbitQueue;
+        private EasyNetQ.Topology.IExchange _rabbitExchange;
 
         Timer _timProducer;
         Int32 countOfMessages;
-        public ActiveProducer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus)
+        public ActiveProducer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IAdvancedBus rabbitBus, EasyNetQ.Topology.IQueue rabbitQueue, EasyNetQ.Topology.IExchange rabbitExchange)
         {
             _rabbitBus = rabbitBus;
+            _rabbitExchange = rabbitExchange;
+            _rabbitQueue = rabbitQueue;
 
             ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
             _amqProducer = amqSession.CreateProducer(topic);
@@ -41,7 +45,10 @@ namespace ProcessFiles
             log.Debug("Sending message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
             var objectMessage = _amqProducer.CreateObjectMessage(corpmessage);
             _amqProducer.Send(objectMessage);
-            _rabbitBus.Publish<CorpMessage>(corpmessage);
+            var rabbitMessage = new EasyNetQ.Message<CorpMessage>(corpmessage);
+
+            //_rabbitBus.Publish<CorpMessage>(corpmessage);
+            _rabbitBus.Publish<CorpMessage>(_rabbitExchange, "*", false, false, rabbitMessage);
 
         }
 
