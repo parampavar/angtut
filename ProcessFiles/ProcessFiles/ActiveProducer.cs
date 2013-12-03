@@ -14,13 +14,13 @@ namespace ProcessFiles
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IMessageProducer _amqProducer;
-        private EasyNetQ.IAdvancedBus _rabbitBus;
+        private EasyNetQ.IBus _rabbitBus;
         private EasyNetQ.Topology.IQueue _rabbitQueue;
         private EasyNetQ.Topology.IExchange _rabbitExchange;
 
         Timer _timProducer;
         Int32 countOfMessages;
-        public ActiveProducer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IAdvancedBus rabbitBus, EasyNetQ.Topology.IQueue rabbitQueue, EasyNetQ.Topology.IExchange rabbitExchange)
+        public ActiveProducer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus, EasyNetQ.Topology.IQueue rabbitQueue, EasyNetQ.Topology.IExchange rabbitExchange)
         {
             _rabbitBus = rabbitBus;
             _rabbitExchange = rabbitExchange;
@@ -48,7 +48,7 @@ namespace ProcessFiles
             var rabbitMessage = new EasyNetQ.Message<CorpMessage>(corpmessage);
 
             //_rabbitBus.Publish<CorpMessage>(corpmessage);
-            _rabbitBus.Publish<CorpMessage>(_rabbitExchange, "*", false, false, rabbitMessage);
+            _rabbitBus.Advanced.Publish<CorpMessage>(_rabbitExchange, "*", false, false, rabbitMessage);
 
         }
 

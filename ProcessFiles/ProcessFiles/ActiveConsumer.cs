@@ -13,10 +13,10 @@ namespace ProcessFiles
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IMessageConsumer _amqConsumer;
-        private EasyNetQ.IAdvancedBus _rabbitBus;
+        private EasyNetQ.IBus _rabbitBus;
         private EasyNetQ.Topology.IQueue _rabbitQueue;
         private EasyNetQ.Topology.IExchange _rabbitExchange;
-        public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IAdvancedBus rabbitBus, EasyNetQ.Topology.IQueue rabbitQueue, EasyNetQ.Topology.IExchange rabbitExchange)
+        public ActiveConsumer(IConnection amqConnection, ISession amqSession, String amqQueueName, EasyNetQ.IBus rabbitBus, EasyNetQ.Topology.IQueue rabbitQueue, EasyNetQ.Topology.IExchange rabbitExchange)
         {
             try
             {
@@ -24,12 +24,16 @@ namespace ProcessFiles
                 _rabbitExchange = rabbitExchange;
                 _rabbitQueue = rabbitQueue;
                 ActiveMQQueue topic = new ActiveMQQueue(amqQueueName);
+                _rabbitQueue = _rabbitBus.Advanced.QueueDeclare(amqQueueName);
 
                 _amqConsumer = amqSession.CreateConsumer(topic);
                 _amqConsumer.Listener +=_amqConsumer_Listener;
 
-               //_rabbitBus.Subscribe<CorpMessage>(amqQueueName, _rabbitMQConsumer_Listener);
-                _rabbitBus.Consume<CorpMessage>(_rabbitQueue, _rabbitMQABConsumer_Listener);
+                _rabbitBus.Advanced.Consume<CorpMessage>(_rabbitQueue, (corpmessage, info) => 
+                    {
+                        log.Info("RabbitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage.Body));
+                    });
+
 
                log.Info("Consumer Connected to Queue '" + amqQueueName + "'");
             }
@@ -44,11 +48,6 @@ namespace ProcessFiles
             }
         }
 
-        private Task _rabbitMQABConsumer_Listener(EasyNetQ.IMessage<CorpMessage> corpmessage, EasyNetQ.MessageReceivedInfo arg2)
-        {
-            if (corpmessage != null)
-                log.Info("RabbiitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
-        }
 
         private void _amqConsumer_Listener(IMessage message)
         {
@@ -62,15 +61,37 @@ namespace ProcessFiles
                     log.Info("ActiveMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
             }
         }
-        private void _rabbitMQConsumer_Listener(CorpMessage corpmessage)
-        {
-            //log.Debug("Inside RabbiitMQ listener event.");
-            if (corpmessage != null)
-                log.Info("RabbiitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
-        }
 
         public void Dispose()
         {
+        }
+
+    }
+
+    public class RabbitMQConsumerHandler :  EasyNetQ.Consumer.IHandlerRegistration
+    {
+
+        public EasyNetQ.Consumer.IHandlerRegistration Add<T>(Action<EasyNetQ.IMessage<T>, EasyNetQ.MessageReceivedInfo> handler) where T : class
+        {
+         
+            throw new NotImplementedException();
+        }
+
+        public EasyNetQ.Consumer.IHandlerRegistration Add<T>(Func<EasyNetQ.IMessage<T>, EasyNetQ.MessageReceivedInfo, Task> handler) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ThrowOnNoMatchingHandler
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

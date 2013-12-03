@@ -10,21 +10,29 @@ import javax.jms.*;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQQueue;
 
 public class QueueProducer {
 
-	private static Session _amqSession;
+	private static ActiveMQSession _amqSession;
 	private static MessageProducer _amqProducer;	
+	
+	private static com.rabbitmq.client.Connection _rmqconnection;
+	private static com.rabbitmq.client.Channel _rmqchannel;
 	private static Timer _timProducer;
 	private int countOfMessages = 0;
 	
-	public QueueProducer(Connection amqConnection, Session amqSession, String queueName) throws JMSException
+	public QueueProducer(ActiveMQConnection amqConnection, ActiveMQSession amqSession, com.rabbitmq.client.Connection rmqconnection, com.rabbitmq.client.Channel rmqchannel, String queueName) throws JMSException
 	{
         ActiveMQQueue topic = new ActiveMQQueue(queueName);
         _amqSession = amqSession;
         _amqProducer = _amqSession.createProducer(topic);
         countOfMessages = 0;
+        
+        _rmqconnection = rmqconnection;
+        _rmqchannel = rmqchannel;
+        
         _timProducer = new Timer();
         _timProducer.schedule(new TimerTask() {
 			

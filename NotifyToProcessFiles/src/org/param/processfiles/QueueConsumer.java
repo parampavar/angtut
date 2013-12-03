@@ -8,6 +8,7 @@ import javax.jms.*;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQMessageConsumer;
+import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -16,11 +17,11 @@ import com.google.gson.Gson;
 public class QueueConsumer  {
 	
 
-	private static Session _amqSession;
+	private static ActiveMQSession _amqSession;
 	private static MessageConsumer _amqConsumer;
 
 	
-	public QueueConsumer(Connection amqConnection, Session amqSession, String queueName){
+	public QueueConsumer(ActiveMQConnection amqConnection, ActiveMQSession amqSession, String queueName){
 		
 		try {
 			_amqSession = amqSession;

@@ -13,10 +13,12 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQQueue;
 
-import com.rabbitmq.client.Connection;
+//import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 
@@ -28,10 +30,14 @@ public class NotifyToProcessFiles {
 	private static String MessagePublisher = "NotifyToProcessFiles";
 	
 	private static ActiveMQConnectionFactory _amqFactory;
-	private static Connection _amqconnection;
-	private static Session _amqsession;
+	private static ActiveMQConnection _amqconnection;
+	private static ActiveMQSession _amqsession;
 	private static QueueConsumer amqConsumer;
 	private static QueueProducer amqProducer;
+	
+	private static com.rabbitmq.client.ConnectionFactory _rmqfactory;
+	private static com.rabbitmq.client.Connection _rmqconnection;
+	private static com.rabbitmq.client.Channel _rmqchannel;
 
 	/**
 	 * @param args
@@ -42,26 +48,27 @@ public class NotifyToProcessFiles {
 		try 
 		{
 			_amqFactory = new ActiveMQConnectionFactory(new URI(MessageHost + ":" + MessageHostPort));
-			_amqconnection = _amqFactory.createConnection();
+			_amqconnection = (ActiveMQConnection) _amqFactory.createConnection();
 			_amqconnection.start();
-			_amqsession = _amqconnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			_amqsession = (ActiveMQSession) _amqconnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			System.out.println("Session created");
 			
 			
-			ConnectionFactory factory = new ConnectionFactory();
-			factory.setUsername("guest");
-			factory.setPassword("guest");
-			factory.setVirtualHost("\\");
-			factory.setHost("localhost");
-			factory.setPort(5672);
-			com.rabbitmq.client.Connection conn = factory.newConnection();
+			_rmqfactory = new ConnectionFactory();
+			_rmqfactory.setUsername("guest");
+			_rmqfactory.setPassword("guest");
+			_rmqfactory.setVirtualHost("\\");
+			_rmqfactory.setHost("localhost");
+			_rmqfactory.setPort(5672);
+			_rmqconnection = _rmqfactory.newConnection();
+			_rmqchannel = _rmqconnection.createChannel();
 		}
 		catch (Exception e)
 		{
 	        System.out.println("Exception occured.  Shutting down client.");
 		}
 		
-		amqProducer = new QueueProducer(_amqconnection, _amqsession, MessageQueueName);
+		amqProducer = new QueueProducer(_amqconnection, _amqsession, _rmqconnection, _rmqchannel, MessageQueueName);
 		amqConsumer = new QueueConsumer(_amqconnection, _amqsession, MessageQueueName);
 		
 		System.out.println("Type 'exit' to stop.");
