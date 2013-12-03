@@ -69,7 +69,7 @@ public class NotifyToProcessFiles {
 		}
 		
 		amqProducer = new QueueProducer(_amqconnection, _amqsession, _rmqconnection, _rmqchannel, MessageQueueName);
-		amqConsumer = new QueueConsumer(_amqconnection, _amqsession, MessageQueueName);
+		amqConsumer = new QueueConsumer(_amqconnection, _amqsession, _rmqconnection, _rmqchannel, MessageQueueName);
 		
 		System.out.println("Type 'exit' to stop.");
 		

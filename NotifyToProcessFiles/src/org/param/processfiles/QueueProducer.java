@@ -1,5 +1,6 @@
 package org.param.processfiles;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,6 +13,7 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.commons.lang3.SerializationUtils;
 
 public class QueueProducer {
 
@@ -23,11 +25,23 @@ public class QueueProducer {
 	private static Timer _timProducer;
 	private int countOfMessages = 0;
 	
-	public QueueProducer(ActiveMQConnection amqConnection, ActiveMQSession amqSession, com.rabbitmq.client.Connection rmqconnection, com.rabbitmq.client.Channel rmqchannel, String queueName) throws JMSException
+	private static String _queueName;
+	
+	public QueueProducer(ActiveMQConnection amqConnection, ActiveMQSession amqSession, com.rabbitmq.client.Connection rmqconnection, com.rabbitmq.client.Channel rmqchannel, String queueName)
 	{
-        ActiveMQQueue topic = new ActiveMQQueue(queueName);
+		
+		_queueName = queueName;
+        ActiveMQQueue topic = new ActiveMQQueue(_queueName);
         _amqSession = amqSession;
-        _amqProducer = _amqSession.createProducer(topic);
+        try 
+        {
+			_amqProducer = _amqSession.createProducer(topic);
+		} 
+        catch (JMSException e1) 
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         countOfMessages = 0;
         
         _rmqconnection = rmqconnection;
@@ -48,8 +62,16 @@ public class QueueProducer {
 	            	System.out.println(msg);
 	            	ObjectMessage message;
 					message = _amqSession.createObjectMessage(corpmessage);
-		            _amqProducer.send(message);
+		           // _amqProducer.send(message);
+		            
+		            _rmqchannel.basicPublish(_queueName, "*", null, SerializationUtils.serialize(corpmessage));
 				} 
+	            catch (IOException e) 
+				{
+					System.out.println("errrrr messages...");
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	            catch (JMSException e) 
 				{
 					System.out.println("errrrr messages...");
