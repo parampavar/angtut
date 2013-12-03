@@ -21,6 +21,8 @@ import org.apache.activemq.command.ActiveMQQueue;
 //import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 
 public class NotifyToProcessFiles {
 
@@ -57,11 +59,30 @@ public class NotifyToProcessFiles {
 			_rmqfactory = new ConnectionFactory();
 			_rmqfactory.setUsername("guest");
 			_rmqfactory.setPassword("guest");
-			_rmqfactory.setVirtualHost("\\");
+			_rmqfactory.setVirtualHost("/");
 			_rmqfactory.setHost("localhost");
 			_rmqfactory.setPort(5672);
 			_rmqconnection = _rmqfactory.newConnection();
+			_rmqconnection.addShutdownListener( new ShutdownListener() {
+				
+				public void shutdownCompleted(ShutdownSignalException arg0) {
+					// TODO Auto-generated method stub
+					System.out.println("RabbitMQ Connection shutdown");
+				}
+			});
 			_rmqchannel = _rmqconnection.createChannel();
+			_rmqchannel.addShutdownListener( new ShutdownListener() {
+				
+				public void shutdownCompleted(ShutdownSignalException arg0) {
+					// TODO Auto-generated method stub
+					System.out.println("RabbitMQ Channel shutdown");
+				}
+			});
+			
+			_rmqchannel.exchangeDeclare(MessageQueueName, "direct", true);
+			_rmqchannel.queueDeclare(MessageQueueName, true, false, false, null);
+			_rmqchannel.queueBind(MessageQueueName, MessageQueueName, "*");
+			System.out.println("_rmqchannel.isOpen()=" + _rmqchannel.isOpen());
 		}
 		catch (Exception e)
 		{

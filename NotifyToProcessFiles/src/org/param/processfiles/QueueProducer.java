@@ -62,8 +62,8 @@ public class QueueProducer {
 	            	System.out.println(msg);
 	            	ObjectMessage message;
 					message = _amqSession.createObjectMessage(corpmessage);
-		           // _amqProducer.send(message);
-		            
+		            _amqProducer.send(message);
+					
 		            _rmqchannel.basicPublish(_queueName, "*", null, SerializationUtils.serialize(corpmessage));
 				} 
 	            catch (IOException e) 
@@ -78,21 +78,6 @@ public class QueueProducer {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-/*	            
-	            TextMessage message;
-	            
-	            try 
-				{
-	            	System.out.println("Hello from JAVA count =" + countOfMessages);
-					message = _amqSession.createTextMessage("Hello from JAVA count =" + countOfMessages);
-		            _amqProducer.send(message);
-				} catch (JMSException e) 
-				{
-					System.out.println("errrrr messages...");
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-*/				
 			}
 		}, 0, 2000);
 		

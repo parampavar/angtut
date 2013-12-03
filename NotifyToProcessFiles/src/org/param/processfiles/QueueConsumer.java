@@ -36,7 +36,6 @@ public class QueueConsumer  {
 			_amqSession = amqSession;
 	        _rmqconnection = rmqconnection;
 	        _rmqchannel = rmqchannel;
-	        
 			
 			ActiveMQQueue topic = new ActiveMQQueue(queueName);
 			_amqConsumer = _amqSession.createConsumer(topic);
@@ -69,27 +68,29 @@ public class QueueConsumer  {
 			
 			
 			boolean autoAck = false;
-			_rmqchannel.basicConsume(_queueName, autoAck, _queueName + "_JAVA",
-			     new com.rabbitmq.client.DefaultConsumer(_rmqchannel) {
-			         @Override
-			         public void handleDelivery(String consumerTag,
-			        		 com.rabbitmq.client.Envelope envelope,
-			        		 					com.rabbitmq.client.AMQP.BasicProperties properties,
-			                                    byte[] body)
-			             throws IOException
-			         {
-			             String routingKey = envelope.getRoutingKey();
-			             String contentType = properties.getContentType();
-			             long deliveryTag = envelope.getDeliveryTag();
-			             // (process the message components here ...)
-			             CorpMessage corpMessage = (CorpMessage) SerializationUtils.deserialize(body);
-			            	Gson gson = new Gson();
-			            	String sGson = gson.toJson(corpMessage, corpMessage.getClass());
-			            	String esJson = StringEscapeUtils.unescapeJava(sGson);
-				            System.out.println("Received Rabbit message JAVA: " + esJson );
-			             _rmqchannel.basicAck(deliveryTag, false);
-			         }
-			     });
+			
+			com.rabbitmq.client.Consumer rmqconsumer = new com.rabbitmq.client.DefaultConsumer(_rmqchannel) {
+		         @Override
+		         public void handleDelivery(String consumerTag,
+		        		 com.rabbitmq.client.Envelope envelope,
+		        		 					com.rabbitmq.client.AMQP.BasicProperties properties,
+		                                    byte[] body)
+		             throws IOException
+		         {
+		             String routingKey = envelope.getRoutingKey();
+		             String contentType = properties.getContentType();
+		             long deliveryTag = envelope.getDeliveryTag();
+		             // (process the message components here ...)
+		             CorpMessage corpMessage = (CorpMessage) SerializationUtils.deserialize(body);
+		            	Gson gson = new Gson();
+		            	String sGson = gson.toJson(corpMessage, corpMessage.getClass());
+		            	String esJson = StringEscapeUtils.unescapeJava(sGson);
+			            System.out.println("Received Rabbit message JAVA: " + esJson );
+		             _rmqchannel.basicAck(deliveryTag, false);
+		         }
+		     };
+
+			_rmqchannel.basicConsume(_queueName, autoAck, _queueName, rmqconsumer);
 		}
 		catch (Exception e)
 		{
