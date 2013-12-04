@@ -32,6 +32,16 @@ namespace ProcessFiles
         private EasyNetQ.Topology.IQueue _rabbitQueue;
         private EasyNetQ.Topology.IExchange _rabbitExchange;
 
+        private EasyNetQ.Topology.IQueue _rabbitQueueProducer;
+        private EasyNetQ.Topology.IExchange _rabbitExchangeProducer;
+
+        private EasyNetQ.Topology.IQueue _rabbitQueueConsumer;
+        private EasyNetQ.Topology.IExchange _rabbitExchangeConsumer;
+
+        private static String MessageQueueName = "ProcessFiles";
+        private static String ProduceToMessageQueueName = MessageQueueName + "-FROM.NET";
+        private static String ConsumeFromMessageQueueName = MessageQueueName + "-FROMJAVA";
+
         public Form1()
         {
             InitializeComponent();
@@ -63,9 +73,18 @@ namespace ProcessFiles
                 log.Debug("ActiveMQ Session Created.");
 
                 _rabbitBus = EasyNetQ.RabbitHutch.CreateBus("host=localhost:5672");
-                _rabbitQueue = _rabbitBus.Advanced.QueueDeclare(ProcessFiles.Properties.Settings.Default.MessageQueueName);
-                _rabbitExchange = _rabbitBus.Advanced.ExchangeDeclare(ProcessFiles.Properties.Settings.Default.MessageQueueName, EasyNetQ.Topology.ExchangeType.Direct);
-                _rabbitBus.Advanced.Bind(_rabbitExchange, _rabbitQueue, "*");
+                
+                // RabbitMQ Producer setup - begin 
+                _rabbitQueueProducer = _rabbitBus.Advanced.QueueDeclare(ProduceToMessageQueueName);
+                _rabbitExchangeProducer = _rabbitBus.Advanced.ExchangeDeclare(ProduceToMessageQueueName, EasyNetQ.Topology.ExchangeType.Direct);
+                _rabbitBus.Advanced.Bind(_rabbitExchangeProducer, _rabbitQueueProducer, "*");
+                // RabbitMQ Producer setup - End 
+
+                // RabbitMQ Consumer setup - begin 
+                _rabbitQueueConsumer = _rabbitBus.Advanced.QueueDeclare(ConsumeFromMessageQueueName);
+                _rabbitExchangeConsumer = _rabbitBus.Advanced.ExchangeDeclare(ConsumeFromMessageQueueName, EasyNetQ.Topology.ExchangeType.Direct);
+                _rabbitBus.Advanced.Bind(_rabbitExchangeConsumer, _rabbitQueueConsumer, "*");
+                // RabbitMQ Consumer setup - End 
 
                 log.Debug("RabbitMQ Session Created.");
                 //_rabbitBus = EasyNetQ.RabbitHutch.CreateBus("localhost", 5672,
@@ -98,12 +117,12 @@ namespace ProcessFiles
 
         private void receiveMessages_Click(object sender, EventArgs e)
         {
-            amqConsumer = new ActiveConsumer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName, _rabbitBus, _rabbitQueue, _rabbitExchange);
+            amqConsumer = new ActiveConsumer(_amqconnection, _amqsession, ConsumeFromMessageQueueName, _rabbitBus, _rabbitQueueConsumer, _rabbitExchangeConsumer);
         }
 
         private void sendMessages_Click(object sender, EventArgs e)
         {
-            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProcessFiles.Properties.Settings.Default.MessageQueueName, _rabbitBus, _rabbitQueue, _rabbitExchange);
+            amqProducer = new ActiveProducer(_amqconnection, _amqsession, ProduceToMessageQueueName, _rabbitBus, _rabbitQueueProducer, _rabbitExchangeProducer);
         }
     }
 

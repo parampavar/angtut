@@ -3,32 +3,26 @@ package org.param.processfiles;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Scanner;
-import java.util.Timer;
 
-import javax.jms.Connection;
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSession;
-import org.apache.activemq.command.ActiveMQQueue;
 
-//import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ShutdownListener;
 import com.rabbitmq.client.ShutdownSignalException;
+//import com.rabbitmq.client.Connection;
 
 public class NotifyToProcessFiles {
 
 	private static String MessageHost = "tcp://localhost";
 	private static String MessageHostPort = "61616";
 	private static String MessageQueueName = "ProcessFiles";
+	private static String ProduceToMessageQueueName = MessageQueueName + "-FROMJAVA";
+	private static String ConsumeFromMessageQueueName = MessageQueueName + "-FROM.NET";
 	private static String MessagePublisher = "NotifyToProcessFiles";
 	
 	private static ActiveMQConnectionFactory _amqFactory;
@@ -40,6 +34,8 @@ public class NotifyToProcessFiles {
 	private static com.rabbitmq.client.ConnectionFactory _rmqfactory;
 	private static com.rabbitmq.client.Connection _rmqconnection;
 	private static com.rabbitmq.client.Channel _rmqchannel;
+	private static com.rabbitmq.client.Channel _rmqchannelProducer;
+	private static com.rabbitmq.client.Channel _rmqchannelConsumer;
 
 	/**
 	 * @param args
@@ -70,27 +66,47 @@ public class NotifyToProcessFiles {
 					System.out.println("RabbitMQ Connection shutdown");
 				}
 			});
-			_rmqchannel = _rmqconnection.createChannel();
-			_rmqchannel.addShutdownListener( new ShutdownListener() {
+			
+			// RabbitMQ Producer Channel setup - begin
+			_rmqchannelProducer = _rmqconnection.createChannel();
+			_rmqchannelProducer.addShutdownListener( new ShutdownListener() {
 				
 				public void shutdownCompleted(ShutdownSignalException arg0) {
 					// TODO Auto-generated method stub
-					System.out.println("RabbitMQ Channel shutdown");
+					System.out.println("_rmqchannelProducer Channel shutdown");
 				}
 			});
 			
-			_rmqchannel.exchangeDeclare(MessageQueueName, "direct", true);
-			_rmqchannel.queueDeclare(MessageQueueName, true, false, false, null);
-			_rmqchannel.queueBind(MessageQueueName, MessageQueueName, "*");
-			System.out.println("_rmqchannel.isOpen()=" + _rmqchannel.isOpen());
+			_rmqchannelProducer.exchangeDeclare(ProduceToMessageQueueName, "direct", true);
+			_rmqchannelProducer.queueDeclare(ProduceToMessageQueueName, true, false, false, null);
+			_rmqchannelProducer.queueBind(ProduceToMessageQueueName, ProduceToMessageQueueName, "*");
+			System.out.println("_rmqchannelProducer.isOpen()=" + _rmqchannelProducer.isOpen());
+			// RabbitMQ Producer Channel setup - end
+
+			// RabbitMQ Consumer Channel setup - begin
+			_rmqchannelConsumer = _rmqconnection.createChannel();
+			_rmqchannelConsumer.addShutdownListener( new ShutdownListener() {
+				
+				public void shutdownCompleted(ShutdownSignalException arg0) {
+					// TODO Auto-generated method stub
+					System.out.println("_rmqchannelConsumer Channel shutdown");
+				}
+			});
+			
+			_rmqchannelConsumer.exchangeDeclare(ConsumeFromMessageQueueName, "direct", true);
+			_rmqchannelConsumer.queueDeclare(ConsumeFromMessageQueueName, true, false, false, null);
+			_rmqchannelConsumer.queueBind(ConsumeFromMessageQueueName, ConsumeFromMessageQueueName, "*");
+			System.out.println("_rmqchannelConsumer.isOpen()=" + _rmqchannelConsumer.isOpen());
+			// RabbitMQ Consumer Channel setup - end
+			
 		}
 		catch (Exception e)
 		{
 	        System.out.println("Exception occured.  Shutting down client.");
 		}
 		
-		amqProducer = new QueueProducer(_amqconnection, _amqsession, _rmqconnection, _rmqchannel, MessageQueueName);
-		amqConsumer = new QueueConsumer(_amqconnection, _amqsession, _rmqconnection, _rmqchannel, MessageQueueName);
+		amqProducer = new QueueProducer(_amqconnection, _amqsession, _rmqconnection, _rmqchannelProducer, ProduceToMessageQueueName);
+		amqConsumer = new QueueConsumer(_amqconnection, _amqsession, _rmqconnection, _rmqchannelConsumer, ConsumeFromMessageQueueName);
 		
 		System.out.println("Type 'exit' to stop.");
 		

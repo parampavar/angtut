@@ -27,13 +27,14 @@ namespace ProcessFiles
                 _rabbitQueue = _rabbitBus.Advanced.QueueDeclare(amqQueueName);
 
                 _amqConsumer = amqSession.CreateConsumer(topic);
-                _amqConsumer.Listener +=_amqConsumer_Listener;
+                _amqConsumer.Listener += _amqConsumer_Listener;
 
-                _rabbitBus.Advanced.Consume<CorpMessage>(_rabbitQueue, (corpmessage, info) => 
-                    {
-                        log.Info("RabbitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage.Body));
-                    });
-
+                _rabbitBus.Advanced.Consume(_rabbitQueue, (body, properties, info) => Task.Factory.StartNew(() =>
+                {
+                    String message = System.Text.Encoding.UTF8.GetString(body);
+                    CorpMessage corpmessage = Newtonsoft.Json.JsonConvert.DeserializeObject<CorpMessage>(message);
+                    log.Info("RabbitMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
+                }));
 
                log.Info("Consumer Connected to Queue '" + amqQueueName + "'");
             }
@@ -52,13 +53,13 @@ namespace ProcessFiles
         private void _amqConsumer_Listener(IMessage message)
         {
             //log.Debug("Inside listener event.");
-            var objectMessage = message as IObjectMessage;
+            var tMessage = message as ITextMessage;
 
-            if (objectMessage != null)
+            if (tMessage != null)
             {
-                CorpMessage corpmessage = objectMessage.Body as CorpMessage;
-                if ( corpmessage != null )
-                    log.Info("ActiveMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
+                CorpMessage corpmessage = new CorpMessage(); // = objectMessage.Body as CorpMessage;
+                corpmessage = (CorpMessage)Newtonsoft.Json.JsonConvert.DeserializeObject(tMessage.Text, corpmessage.GetType());
+                log.Info("ActiveMQ received message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
             }
         }
 

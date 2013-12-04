@@ -2,9 +2,13 @@ package org.param.processfiles;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class CorpMessage implements Serializable {
 	
+	@SerializedName("Text") 
 	private String _text;
+	@SerializedName("Subject") 
 	private String _subject;
 	
 	public String get_text() {

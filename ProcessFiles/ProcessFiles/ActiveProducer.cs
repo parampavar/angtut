@@ -42,13 +42,14 @@ namespace ProcessFiles
             var corpmessage = new CorpMessage();
             corpmessage.Text = msg;
             corpmessage.Subject = countOfMessages.ToString();
-            log.Debug("Sending message json=" + Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage));
-            var objectMessage = _amqProducer.CreateObjectMessage(corpmessage);
-            _amqProducer.Send(objectMessage);
-            var rabbitMessage = new EasyNetQ.Message<CorpMessage>(corpmessage);
 
-            //_rabbitBus.Publish<CorpMessage>(corpmessage);
-            _rabbitBus.Advanced.Publish<CorpMessage>(_rabbitExchange, "*", false, false, rabbitMessage);
+            string esJson = Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage);
+            log.Debug("Sending message json=" + esJson);
+
+            var tMessage = _amqProducer.CreateTextMessage(esJson);
+            _amqProducer.Send(tMessage);
+            
+            _rabbitBus.Advanced.Publish(_rabbitExchange, "*", false, false, new EasyNetQ.MessageProperties(), System.Text.Encoding.UTF8.GetBytes(esJson));
 
         }
 

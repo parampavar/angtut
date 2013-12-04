@@ -1,19 +1,21 @@
 package org.param.processfiles;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import com.google.gson.Gson;
 
 public class QueueProducer {
 
@@ -59,12 +61,17 @@ public class QueueProducer {
 		            corpmessage.set_text(msg);
 		            corpmessage.set_subject(Integer.toString(countOfMessages));
 	            	
-	            	System.out.println(msg);
-	            	ObjectMessage message;
-					message = _amqSession.createObjectMessage(corpmessage);
-		            _amqProducer.send(message);
+	            	Gson gson = new Gson();
+	            	String sGson = gson.toJson(corpmessage, corpmessage.getClass());
+	            	String esJson = StringEscapeUtils.unescapeJava(sGson);
+	            	
+					TextMessage tmessage = _amqSession.createTextMessage(esJson);
+	            	System.out.println(sGson);
+	            	System.out.println(esJson);
 					
-		            _rmqchannel.basicPublish(_queueName, "*", null, SerializationUtils.serialize(corpmessage));
+		            _amqProducer.send(tmessage);
+					
+		            _rmqchannel.basicPublish(_queueName, "*", null, esJson.getBytes("UTF-8"));
 				} 
 	            catch (IOException e) 
 				{

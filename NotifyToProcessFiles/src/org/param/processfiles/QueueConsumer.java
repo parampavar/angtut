@@ -1,15 +1,14 @@
 package org.param.processfiles;
-import com.rabbitmq.client.Consumer;
-import com.rabbitmq.client.DefaultConsumer;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
+import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQMessageConsumer;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.commons.lang3.SerializationUtils;
@@ -43,7 +42,24 @@ public class QueueConsumer  {
 			{
 				public void onMessage(Message message) 
 				{
-			        if (message instanceof ObjectMessage) 
+			        if (message instanceof TextMessage) 
+			        {
+			        	TextMessage tMessage = (TextMessage)message;
+			            try 
+			            {
+			            	String esJson = StringEscapeUtils.unescapeJava(tMessage.getText());
+
+			            	Gson gson = new Gson();
+			            	CorpMessage corpMessage = new CorpMessage();
+			            	corpMessage = gson.fromJson(esJson, corpMessage.getClass());
+			            	System.out.println("Received Active message JAVA: " + esJson );
+			            } 
+			            catch (JMSException ex) 
+			            {
+			                System.out.println("Error reading message: " + ex);
+			            }
+			        } 
+			        else if (message instanceof ObjectMessage) 
 			        {
 			        	ObjectMessage objMessage = (ObjectMessage)message;
 			            try 
@@ -81,11 +97,12 @@ public class QueueConsumer  {
 		             String contentType = properties.getContentType();
 		             long deliveryTag = envelope.getDeliveryTag();
 		             // (process the message components here ...)
-		             CorpMessage corpMessage = (CorpMessage) SerializationUtils.deserialize(body);
-		            	Gson gson = new Gson();
-		            	String sGson = gson.toJson(corpMessage, corpMessage.getClass());
-		            	String esJson = StringEscapeUtils.unescapeJava(sGson);
-			            System.out.println("Received Rabbit message JAVA: " + esJson );
+
+		             String esJson = new String(body);
+	            	 Gson gson = new Gson();
+	            	 CorpMessage corpMessage = new CorpMessage();
+	            	 corpMessage = gson.fromJson(esJson, corpMessage.getClass());
+		            System.out.println("Received Rabbit message JAVA: " + esJson );
 		             _rmqchannel.basicAck(deliveryTag, false);
 		         }
 		     };
