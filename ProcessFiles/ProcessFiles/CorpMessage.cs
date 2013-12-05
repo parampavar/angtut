@@ -111,6 +111,21 @@ namespace ProcessFiles
             set { _dtEndDate = value; }
         }
 
+        private Address _homeAddress;
+
+        public Address HomeAddress
+        {
+            get { return _homeAddress; }
+            set { _homeAddress = value; }
+        }
+        private Address _workAddress;
+
+        public Address WorkAddress
+        {
+            get { return _workAddress; }
+            set { _workAddress = value; }
+        }
+
         public CorpMessage()
         {
         }

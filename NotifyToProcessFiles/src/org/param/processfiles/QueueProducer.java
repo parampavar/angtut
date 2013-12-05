@@ -114,6 +114,24 @@ public class QueueProducer {
 		            corpmessage.set_dtStartDate( new Date(System.currentTimeMillis()));
 		            corpmessage.set_dtEndDate( new Date(System.currentTimeMillis()));
 		            
+		            Address _homeAddress = new Address();
+		            _homeAddress.set_city("San Ramon");
+		            _homeAddress.set_country("USA");
+		            _homeAddress.set_postalcode("92452");
+		            _homeAddress.set_state("California");
+		            _homeAddress.set_street1("");
+		            _homeAddress.set_street2("1000 ABC Street");
+
+		            Address _workAddress = new Address();
+		            _workAddress.set_city("San Francisco");
+		            _workAddress.set_country("USA");
+		            _workAddress.set_postalcode("92452");
+		            _workAddress.set_state("California");
+		            _workAddress.set_street1("");
+		            _workAddress.set_street2("5000 ABC Street");
+		            
+		            corpmessage.set_homeAddress(_homeAddress);
+		            corpmessage.set_workAddress(_workAddress);
 		            
 	            	Gson gson = new Gson();
 	            	String sGson = gson.toJson(corpmessage, corpmessage.getClass());

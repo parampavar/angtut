@@ -43,6 +43,12 @@ public class CorpMessage implements Serializable {
 	@SerializedName("EndDate") 
 	private Date _dtEndDate;
 	
+	@SerializedName("HomeAddress")
+	private Address _homeAddress;
+	
+	@SerializedName("WorkAddress")
+	private Address _workAddress;
+	
 	public String get_text() {
 		return _text;
 	}
@@ -137,6 +143,22 @@ public class CorpMessage implements Serializable {
 
 	public void set_dtEndDate(Date _dtEndDate) {
 		this._dtEndDate = _dtEndDate;
+	}
+
+	public Address get_homeAddress() {
+		return _homeAddress;
+	}
+
+	public void set_homeAddress(Address _homeAddress) {
+		this._homeAddress = _homeAddress;
+	}
+
+	public Address get_workAddress() {
+		return _workAddress;
+	}
+
+	public void set_workAddress(Address _workAddress) {
+		this._workAddress = _workAddress;
 	}
 
 }

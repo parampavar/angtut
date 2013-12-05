@@ -95,6 +95,25 @@ namespace ProcessFiles
             corpmessage.StartDate = new DateTime(2012, 01, 31, 23, 59, 58, DateTimeKind.Utc);
             corpmessage.EndDate = new DateTime(2012, 12, 31, 23, 59, 58, DateTimeKind.Utc);
 
+            Address _homeAddress = new Address();
+            _homeAddress.City = ("New York");
+            _homeAddress.Country = ("USA");
+            _homeAddress.Postalcode = ("92452");
+            _homeAddress.State = ("New York");
+            _homeAddress.Street1 = ("");
+            _homeAddress.Street2 = ("555 ABC Street");
+
+            Address _workAddress = new Address();
+            _workAddress.City = ("Boston");
+            _workAddress.Country = ("USA");
+            _workAddress.Postalcode = ("92452");
+            _workAddress.State = ("Massccutess");
+            _workAddress.Street1 = ("");
+            _workAddress.Street2 = ("999 ABC Street");
+
+            corpmessage.HomeAddress = _homeAddress;
+            corpmessage.WorkAddress = _workAddress;
+
             string esJson = Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage);
             log.Debug("Sending message json=" + esJson);
 

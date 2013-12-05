@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Address.cs" />
     <Compile Include="CorpMessage.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
