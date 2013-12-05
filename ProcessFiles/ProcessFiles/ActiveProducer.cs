@@ -92,6 +92,8 @@ namespace ProcessFiles
             else
                 corpmessage.FloatNumber = (float.MaxValue);
 
+            corpmessage.StartDate = new DateTime(2012, 01, 31, 23, 59, 58, DateTimeKind.Utc);
+            corpmessage.EndDate = new DateTime(2012, 12, 31, 23, 59, 58, DateTimeKind.Utc);
 
             string esJson = Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage);
             log.Debug("Sending message json=" + esJson);

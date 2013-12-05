@@ -1,6 +1,7 @@
 package org.param.processfiles;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -110,6 +111,10 @@ public class QueueProducer {
 		            corpmessage.set_text(msg);
 		            corpmessage.set_subject(Integer.toString(countOfMessages));
 	            	
+		            corpmessage.set_dtStartDate( new Date(System.currentTimeMillis()));
+		            corpmessage.set_dtEndDate( new Date(System.currentTimeMillis()));
+		            
+		            
 	            	Gson gson = new Gson();
 	            	String sGson = gson.toJson(corpmessage, corpmessage.getClass());
 	            	String esJson = StringEscapeUtils.unescapeJava(sGson);

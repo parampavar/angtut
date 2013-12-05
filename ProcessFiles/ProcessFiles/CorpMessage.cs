@@ -96,6 +96,21 @@ namespace ProcessFiles
             set { _text = value; }
         }
 
+        private DateTime _dtStartDate;
+
+        public DateTime StartDate
+        {
+            get { return _dtStartDate; }
+            set { _dtStartDate = value; }
+        }
+        private DateTime _dtEndDate;
+
+        public DateTime EndDate
+        {
+            get { return _dtEndDate; }
+            set { _dtEndDate = value; }
+        }
+
         public CorpMessage()
         {
         }

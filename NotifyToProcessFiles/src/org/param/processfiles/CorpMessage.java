@@ -1,6 +1,7 @@
 package org.param.processfiles;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -36,6 +37,12 @@ public class CorpMessage implements Serializable {
 	@SerializedName("DoubleNumber") 
 	private double _dNumber;
 
+	@SerializedName("StartDate") 
+	private Date _dtStartDate;
+
+	@SerializedName("EndDate") 
+	private Date _dtEndDate;
+	
 	public String get_text() {
 		return _text;
 	}
@@ -114,6 +121,22 @@ public class CorpMessage implements Serializable {
 
 	public void set_dNumber(double _dNumber) {
 		this._dNumber = _dNumber;
+	}
+
+	public Date get_dtStartDate() {
+		return _dtStartDate;
+	}
+
+	public void set_dtStartDate(Date _dtStartDate) {
+		this._dtStartDate = _dtStartDate;
+	}
+
+	public Date get_dtEndDate() {
+		return _dtEndDate;
+	}
+
+	public void set_dtEndDate(Date _dtEndDate) {
+		this._dtEndDate = _dtEndDate;
 	}
 
 }
