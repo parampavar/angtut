@@ -43,6 +43,56 @@ namespace ProcessFiles
             corpmessage.Text = msg;
             corpmessage.Subject = countOfMessages.ToString();
 
+            if (countOfMessages % 2 == 0)
+            {
+                corpmessage.BooleanFlag = true;
+                corpmessage.ByteCode = SByte.MinValue;// Byte.MinValue;
+                corpmessage.CharYN = 'Y';
+                corpmessage.IntNumber = (int.MinValue);
+                corpmessage.LongNumber = (long.MinValue);
+                corpmessage.ShortNumber = (short.MinValue);
+            }
+            else
+            {
+                corpmessage.BooleanFlag = false;
+                corpmessage.ByteCode = SByte.MaxValue;
+                corpmessage.CharYN = 'N';
+                corpmessage.IntNumber = (int.MaxValue);
+                corpmessage.LongNumber = (long.MaxValue);
+                corpmessage.ShortNumber = (short.MaxValue);
+            }
+
+            if (countOfMessages % 6 == 0)
+                corpmessage.DoubleNumber = (Double.MaxValue);
+            else if (countOfMessages % 6 == 1)
+                corpmessage.DoubleNumber = (Double.MinValue);
+            else if (countOfMessages % 6 == 2)
+                corpmessage.DoubleNumber = (Double.MinValue);
+            else if (countOfMessages % 6 == 3)
+                corpmessage.DoubleNumber = (Double.MaxValue); //corpmessage.DoubleNumber = (Double.NaN);
+            else if (countOfMessages % 6 == 4)
+                corpmessage.DoubleNumber = (Double.MaxValue);
+            else if (countOfMessages % 6 == 5)
+                corpmessage.DoubleNumber = (Double.MaxValue);
+            else
+                corpmessage.DoubleNumber = (Double.MaxValue);
+
+            if (countOfMessages % 6 == 0)
+                corpmessage.FloatNumber = (float.MaxValue);
+            else if (countOfMessages % 6 == 1)
+                corpmessage.FloatNumber = (float.MinValue);
+            else if (countOfMessages % 6 == 2)
+                corpmessage.FloatNumber = (float.MinValue);
+            else if (countOfMessages % 6 == 3)
+                corpmessage.FloatNumber = (float.MaxValue); //corpmessage.FloatNumber = (float.NaN);
+            else if (countOfMessages % 6 == 4)
+                corpmessage.FloatNumber = (float.MaxValue);
+            else if (countOfMessages % 6 == 5)
+                corpmessage.FloatNumber = (float.MaxValue);
+            else
+                corpmessage.FloatNumber = (float.MaxValue);
+
+
             string esJson = Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage);
             log.Debug("Sending message json=" + esJson);
 
