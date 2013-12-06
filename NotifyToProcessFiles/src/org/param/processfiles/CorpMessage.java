@@ -2,6 +2,7 @@ package org.param.processfiles;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -48,6 +49,9 @@ public class CorpMessage implements Serializable {
 	
 	@SerializedName("WorkAddress")
 	private Address _workAddress;
+	
+	@SerializedName("MoreAddresses")
+	private Map<String, Address> _moreAddresses;
 	
 	public String get_text() {
 		return _text;
@@ -159,6 +163,14 @@ public class CorpMessage implements Serializable {
 
 	public void set_workAddress(Address _workAddress) {
 		this._workAddress = _workAddress;
+	}
+
+	public Map<String, Address> get_moreAddresses() {
+		return _moreAddresses;
+	}
+
+	public void set_moreAddresses(Map<String, Address> _moreAddresses) {
+		this._moreAddresses = _moreAddresses;
 	}
 
 }

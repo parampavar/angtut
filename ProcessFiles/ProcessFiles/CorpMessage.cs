@@ -126,6 +126,14 @@ namespace ProcessFiles
             set { _workAddress = value; }
         }
 
+        private Dictionary<String, Address> _moreAddresses;
+
+        public Dictionary<String, Address> MoreAddresses
+        {
+            get { return _moreAddresses; }
+            set { _moreAddresses = value; }
+        }
+
         public CorpMessage()
         {
         }

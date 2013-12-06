@@ -2,6 +2,8 @@ package org.param.processfiles;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -132,6 +134,12 @@ public class QueueProducer {
 		            
 		            corpmessage.set_homeAddress(_homeAddress);
 		            corpmessage.set_workAddress(_workAddress);
+		            
+		            Map<String, Address> _moreAddresses = new HashMap<String, Address>();
+		            _moreAddresses.put("home", _homeAddress);
+		            _moreAddresses.put("work", _workAddress);
+		            
+		            corpmessage.set_moreAddresses(_moreAddresses);
 		            
 	            	Gson gson = new Gson();
 	            	String sGson = gson.toJson(corpmessage, corpmessage.getClass());

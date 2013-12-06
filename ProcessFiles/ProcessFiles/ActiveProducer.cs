@@ -114,6 +114,12 @@ namespace ProcessFiles
             corpmessage.HomeAddress = _homeAddress;
             corpmessage.WorkAddress = _workAddress;
 
+            Dictionary<String, Address> _moreAddresses = new Dictionary<String, Address>();
+            _moreAddresses.Add("home",_homeAddress);
+            _moreAddresses.Add("work",_workAddress);
+
+            corpmessage.MoreAddresses = _moreAddresses;
+
             string esJson = Newtonsoft.Json.JsonConvert.SerializeObject(corpmessage);
             log.Debug("Sending message json=" + esJson);
 
