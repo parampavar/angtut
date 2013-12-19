@@ -17,44 +17,63 @@ namespace Pooja
 {
     //
     // Shows how to use the MediaPlayer class to play audio.
-    class PlayAudio : INotificationReceiver
+	class PlayAudio : INotificationReceiver
     {
         MediaPlayer player = null;
-		//static string filePath = "/data/data/Pooja.Pooja/files/"; // testAudio.mp4";
-		//static string filePath = "/data/Pooja.Pooja/files/"; // testAudio.mp4";
-		//static string filePath = "/Pooja.Pooja/files/"; // testAudio.mp4";
-		static string filePath = "/Pooja.Pooja/files/"; // testAudio.mp4";
-		//static string filePath = "/data/data/Example_WorkingWithAudio.Example_WorkingWithAudio/files/testAudio.mp4";
+		string[] songs = null;
+		int currentIndex = 0;
+		Activity parentActivity = null;
 
-		public void strtPlayer (Activity mainActivity, string fileName)
+		public void strtPlayer (int index)
         {
-			this.StopPlayer ();
-
-            try {
+            try 
+			{
                 if (player == null) 
 				{
-                    player = new MediaPlayer ();
-                } 
+					player = new MediaPlayer();
+					player.Completion += (object sender, EventArgs e) => 
+					{
+						currentIndex++;
+						player.Reset();
+						if (currentIndex < songs.Length)
+						{
+							prepareToPlay(currentIndex);
+						}
+						else
+						{
+							player.Release();
+							player = null;
+						}
+					};
+
+					prepareToPlay(currentIndex);
+					player.Start ();
+				}
 				else 
-				{
                     player.Reset ();
-                }
-
-                // This method works better than setting the file path in SetDataSource. Don't know why.
-				//Java.IO.File file = new Java.IO.File (filePath + fileName);
-				Console.Out.WriteLine ("playing ;" + fileName);
-				AssetFileDescriptor asd = mainActivity.Assets.OpenFd(fileName);
-				//Java.IO.FileInputStream fis = new Java.IO.FileInputStream( asd.FileDescriptor);
-				player.SetDataSource(asd.FileDescriptor,asd.StartOffset, asd.Length);
-
-				//player.SetDataSource (fis.FD);
- 
-                player.Prepare ();
-                player.Start ();
             } catch (Exception ex) {
                 Console.Out.WriteLine (ex.StackTrace);
             }
         }
+
+		private void prepareToPlay(int index)
+		{
+			try
+			{
+				// This method works better than setting the file path in SetDataSource. Don't know why.
+				Console.Out.WriteLine ("playing ;" + songs[index]);
+				AssetFileDescriptor afd = parentActivity.Assets.OpenFd(songs[index]);
+				if ( afd != null )
+				{
+					player.SetDataSource(afd.FileDescriptor,afd.StartOffset, afd.Length);
+					afd.Close();
+					player.Prepare ();
+				}
+			}
+			catch(Exception ex)
+			{
+			}
+		}
 
         public void StopPlayer ()
         {
@@ -64,13 +83,15 @@ namespace Pooja
                 }
 				player.Reset ();
                 player.Release ();
-                player = null;
+				//player = null;
             }
         }
 
-		public void Start (Activity mainActivity,string fileName)
+		public void Start (Activity mainActivity, string[] songs)
         {
-			strtPlayer (mainActivity, fileName);
+			this.songs = songs;
+			this.parentActivity = mainActivity;
+			strtPlayer (0);
         }
 
         public void Stop ()
@@ -81,3 +102,5 @@ namespace Pooja
     }
 
 }
+
+

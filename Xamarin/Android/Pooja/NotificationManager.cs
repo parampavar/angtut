@@ -48,7 +48,7 @@ namespace Pooja
                 case AudioFocus.GainTransient:
                 case AudioFocus.GainTransientMayDuck:
                 case AudioFocus.Gain:
-					parent.Start (mainActivity, this.fileName);
+					//parent.Start (mainActivity, this.fileName);
 					//SetStatus ("Granted");
                     break;
                 // If we get any notificationthat removes focus - just terminate what we were doing.

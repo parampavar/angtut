@@ -60,30 +60,18 @@ namespace Pooja
 			iv.SetImageResource (ganeshPics[pic]);
 			iv.SetAdjustViewBounds (true);
 
-			startOperation (ganeshSongs [pic]);
+			startOperation (ganeshSongs);
 
 			lblMessage.Text = string.Format ("{0} clicks!", count++);
 		}
 
-		void startOperation (string fileName)
+		void startOperation (string[] songs)
 		{
 
-			if (playAudio != null) {
-				playAudio.StopPlayer ();
-				playAudio = null;
-			}
+
 
 			playAudio = new PlayAudio ();
-			bool haveFocus = nMan.RequestAudioResources (this, playAudio, fileName);
-			if (haveFocus) 
-			{
-				playAudio.Start (this,fileName);
-			} 
-			else 
-			{
-				;
-			}
-
+			playAudio.Start (this, songs);
 		}
 	}
 }

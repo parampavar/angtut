@@ -14,7 +14,7 @@ namespace Pooja
 {
     interface INotificationReceiver
     {
-		void Start (Activity mainActivity, String fileName);
+		void Start (Activity mainActivity, String[] fileName);
 
         void Stop ();
     }
