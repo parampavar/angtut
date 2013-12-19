@@ -50,6 +50,9 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NotificationManager.cs" />
+    <Compile Include="PlayAudio.cs" />
+    <Compile Include="INotificationReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -60,6 +63,27 @@
     <AndroidResource Include="Resources\layout\Main.axml" />
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\drawable\Icon.png" />
+    <AndroidResource Include="Resources\drawable\Ganesha1.jpg" />
+    <AndroidResource Include="Resources\drawable\Ganesha2.jpg" />
+    <AndroidResource Include="Resources\drawable\Ganesha3.jpg" />
+    <AndroidResource Include="Resources\drawable\Ganesha4.jpg" />
+    <AndroidResource Include="Resources\drawable\Ganesha5.jpg" />
+    <AndroidResource Include="Resources\drawable\Ganesha6.jpg" />
+    <AndroidResource Include="Resources\drawable\Ganesha7.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Resources\drawable\Ganesha\" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Ganapathiye_Varuvaai.mp3" />
+    <AndroidAsset Include="Assets\Ganapathy Ghanapatah.mp3" />
+    <AndroidAsset Include="Assets\Ganapathy Stotram.mp3" />
+    <AndroidAsset Include="Assets\Ganesha Ashtakam.mp3" />
+    <AndroidAsset Include="Assets\Ganesha Dvadasha.mp3" />
+    <AndroidAsset Include="Assets\Ganesha Pancharatna.mp3" />
+    <AndroidAsset Include="Assets\Ganeshanyasaha.mp3" />
+    <AndroidAsset Include="Assets\neeye_En_Vazhvukku.mp3" />
+    <AndroidAsset Include="Assets\Vinayagane_Vinaitheerpavane.mp3" />
+  </ItemGroup>
 </Project>

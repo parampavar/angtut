@@ -45,7 +45,28 @@ namespace Pooja
 		{
 			
 			// aapt resource value: 0x7f020000
-			public const int Icon = 2130837504;
+			public const int Ganesha1 = 2130837504;
+			
+			// aapt resource value: 0x7f020001
+			public const int Ganesha2 = 2130837505;
+			
+			// aapt resource value: 0x7f020002
+			public const int Ganesha3 = 2130837506;
+			
+			// aapt resource value: 0x7f020003
+			public const int Ganesha4 = 2130837507;
+			
+			// aapt resource value: 0x7f020004
+			public const int Ganesha5 = 2130837508;
+			
+			// aapt resource value: 0x7f020005
+			public const int Ganesha6 = 2130837509;
+			
+			// aapt resource value: 0x7f020006
+			public const int Ganesha7 = 2130837510;
+			
+			// aapt resource value: 0x7f020007
+			public const int Icon = 2130837511;
 			
 			static Drawable()
 			{
@@ -60,11 +81,26 @@ namespace Pooja
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f050004
+			public const int imageView1 = 2131034116;
+			
+			// aapt resource value: 0x7f050002
+			public const int lblMessage = 2131034114;
+			
+			// aapt resource value: 0x7f050006
+			public const int myButton = 2131034118;
+			
 			// aapt resource value: 0x7f050000
-			public const int lblMessage = 2131034112;
+			public const int tableLayout1 = 2131034112;
 			
 			// aapt resource value: 0x7f050001
-			public const int myButton = 2131034113;
+			public const int tableRow1 = 2131034113;
+			
+			// aapt resource value: 0x7f050003
+			public const int tableRow2 = 2131034115;
+			
+			// aapt resource value: 0x7f050005
+			public const int tableRow3 = 2131034117;
 			
 			static Id()
 			{

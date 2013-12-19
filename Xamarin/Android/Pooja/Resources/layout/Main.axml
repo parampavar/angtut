@@ -3,14 +3,50 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <TextView
-        android:text="@string/main.lblMessage"
+    <TableLayout
+        android:minWidth="25px"
+        android:minHeight="25px"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lblMessage" />
-    <Button
-        android:id="@+id/myButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello" />
+        android:layout_height="match_parent"
+        android:id="@+id/tableLayout1"
+        android:stretchColumns="*"
+        android:weightSum="6">
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_weight="1">
+            <TextView
+                android:text="@string/main.lblMessage"
+                android:id="@+id/lblMessage"
+                android:layout_column="0" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_weight="4">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/Ganesha1"
+                android:layout_column="0"
+                android:id="@+id/imageView1"
+                android:cropToPadding="true" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_weight="1">
+            <Button
+                android:id="@+id/myButton"
+                android:text="@string/hello"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_column="0" />
+        </TableRow>
+    </TableLayout>
 </LinearLayout>
