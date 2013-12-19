@@ -67,9 +67,6 @@ namespace Pooja
 
 		void startOperation (string[] songs)
 		{
-
-
-
 			playAudio = new PlayAudio ();
 			playAudio.Start (this, songs);
 		}

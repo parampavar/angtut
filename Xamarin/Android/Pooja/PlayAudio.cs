@@ -47,7 +47,6 @@ namespace Pooja
 					};
 
 					prepareToPlay(currentIndex);
-					player.Start ();
 				}
 				else 
                     player.Reset ();
@@ -68,6 +67,7 @@ namespace Pooja
 					player.SetDataSource(afd.FileDescriptor,afd.StartOffset, afd.Length);
 					afd.Close();
 					player.Prepare ();
+					player.Start ();
 				}
 			}
 			catch(Exception ex)
