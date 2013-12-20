@@ -58,6 +58,15 @@
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />
+    <None Include="Assets\Ganapathiye_Varuvaai.mp3" />
+    <None Include="Assets\Ganapathy Ghanapatah.mp3" />
+    <None Include="Assets\Ganapathy Stotram.mp3" />
+    <None Include="Assets\Ganesha Ashtakam.mp3" />
+    <None Include="Assets\Ganesha Dvadasha.mp3" />
+    <None Include="Assets\Ganesha Pancharatna.mp3" />
+    <None Include="Assets\Ganeshanyasaha.mp3" />
+    <None Include="Assets\neeye_En_Vazhvukku.mp3" />
+    <None Include="Assets\Vinayagane_Vinaitheerpavane.mp3" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Main.axml" />
@@ -74,16 +83,5 @@
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Resources\drawable\Ganesha\" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidAsset Include="Assets\Ganapathiye_Varuvaai.mp3" />
-    <AndroidAsset Include="Assets\Ganapathy Ghanapatah.mp3" />
-    <AndroidAsset Include="Assets\Ganapathy Stotram.mp3" />
-    <AndroidAsset Include="Assets\Ganesha Ashtakam.mp3" />
-    <AndroidAsset Include="Assets\Ganesha Dvadasha.mp3" />
-    <AndroidAsset Include="Assets\Ganesha Pancharatna.mp3" />
-    <AndroidAsset Include="Assets\Ganeshanyasaha.mp3" />
-    <AndroidAsset Include="Assets\neeye_En_Vazhvukku.mp3" />
-    <AndroidAsset Include="Assets\Vinayagane_Vinaitheerpavane.mp3" />
   </ItemGroup>
 </Project>

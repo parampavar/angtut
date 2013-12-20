@@ -10,7 +10,7 @@ using Android.Media;
 namespace Pooja
 {
 	[Activity (Label = "Pooja", MainLauncher = true)]
-	public class MainActivity : Activity
+	public class MainActivity : Activity, ViewSwitcher.IViewFactory
 	{
 		int count = 1;
 		int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha2, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};
@@ -28,11 +28,17 @@ namespace Pooja
 		PlayAudio playAudio = new PlayAudio ();
 		NotificationManager nMan = new NotificationManager ();
 
+		Action atnSwitchImage;
+		int currentImage = 0;
+
+		static public int SWITHIMAGEDURATION = 1500;
+
 		static public bool useNotifications = false;
 
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
+			RequestWindowFeature (WindowFeatures.NoTitle);
 
 			// Set our view from the "main" layout resource
 			SetContentView (Resource.Layout.Main);
@@ -43,32 +49,66 @@ namespace Pooja
 
 			// Get our button from the layout resource,
 			// and attach an event to it
-			Button button = FindViewById<Button> (Resource.Id.myButton);
-			button.Click += sayHello;
+			Button button1 = FindViewById<Button> (Resource.Id.btnStart);
+			button1.Click += btnStart_Click;
+			Button button2 = FindViewById<Button> (Resource.Id.btnNext);
+			button2.Click += btnNext_Click;
 
-			//ImageView iv = FindViewById<ImageView> (Resource.Id.imageView1);
-			//iv.SetImageResource (Resource.Drawable.Ganesha1);
+			atnSwitchImage = delegate {
+				switchImage ();
+			};
+
+			ImageSwitcher iv = FindViewById<ImageSwitcher> (Resource.Id.switcher);
+			iv.SetFactory (this);
+			iv.SetInAnimation (this, Android.Resource.Animation.FadeIn);
+			iv.SetOutAnimation (this, Android.Resource.Animation.FadeOut);
+			iv.PostDelayed(atnSwitchImage, SWITHIMAGEDURATION );
+
+			btnStart_Click (null, null);
 
 		}
-		public void sayHello(object sender, EventArgs e)
+
+		public void switchImage()
 		{
-			TextView lblMessage = FindViewById<TextView> (Resource.Id.lblMessage);
+			currentImage++;
+			if (currentImage == ganeshPics.Length)
+				currentImage = 0;
+			ImageSwitcher iv = FindViewById<ImageSwitcher> (Resource.Id.switcher);
+			Console.Out.WriteLine ("si ;" + currentImage);
+			iv.SetImageResource (ganeshPics[currentImage]);
+			iv.PostDelayed(atnSwitchImage, SWITHIMAGEDURATION );
+		}
 
-			int pic = count % 7;
+		public View MakeView()
+		{
+			ImageView i = new ImageView (this);
+			//i.SetBackgroundColor (Android.Graphics.Color.Azure);
+			i.SetScaleType (ImageView.ScaleType.FitCenter);
+			i.SetAdjustViewBounds (true);
+			i.LayoutParameters = new ImageSwitcher.LayoutParams(ImageSwitcher.LayoutParams.FillParent,ImageSwitcher.LayoutParams.FillParent);
+			return i;
+		}
 
-			ImageView iv = FindViewById<ImageView> (Resource.Id.imageView1);
-			iv.SetImageResource (ganeshPics[pic]);
-			iv.SetAdjustViewBounds (true);
-
+		public void btnStart_Click(object sender, EventArgs e)
+		{
 			startOperation (ganeshSongs);
+		}
 
-			lblMessage.Text = string.Format ("{0} clicks!", count++);
+		public void btnNext_Click(object sender, EventArgs e)
+		{
+			nextSong();
 		}
 
 		void startOperation (string[] songs)
 		{
 			playAudio = new PlayAudio ();
 			playAudio.Start (this, songs);
+		}
+		void nextSong ()
+		{
+			if ( playAudio == null )
+				playAudio = new PlayAudio ();
+			playAudio.Next ();
 		}
 	}
 }

@@ -35,21 +35,14 @@ namespace Pooja
 					{
 						currentIndex++;
 						player.Reset();
-						if (currentIndex < songs.Length)
-						{
-							prepareToPlay(currentIndex);
-						}
-						else
-						{
-							player.Release();
-							player = null;
-						}
+						if (currentIndex == songs.Length)
+							currentIndex = 0;
+						prepareToPlay(currentIndex);
 					};
-
 					prepareToPlay(currentIndex);
 				}
 				else 
-                    player.Reset ();
+					prepareToPlay(currentIndex);
             } catch (Exception ex) {
                 Console.Out.WriteLine (ex.StackTrace);
             }
@@ -72,6 +65,7 @@ namespace Pooja
 			}
 			catch(Exception ex)
 			{
+				Console.Out.WriteLine (ex.StackTrace);
 			}
 		}
 
@@ -91,10 +85,16 @@ namespace Pooja
         {
 			this.songs = songs;
 			this.parentActivity = mainActivity;
-			strtPlayer (0);
+			strtPlayer(0);
         }
 
-        public void Stop ()
+		public void Next ()
+		{
+			this.currentIndex++;
+			strtPlayer(currentIndex);
+		}
+
+		public void Stop ()
         {
             this.StopPlayer ();
         }
