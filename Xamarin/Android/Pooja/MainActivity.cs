@@ -12,8 +12,8 @@ namespace Pooja
 	[Activity (Label = "Pooja", MainLauncher = true)]
 	public class MainActivity : Activity, ViewSwitcher.IViewFactory
 	{
-		int count = 1;
-		int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha2, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};
+		int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};
+		//int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha2, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};
 		string[] ganeshSongs = {"Ganapathiye_Varuvaai.mp3",
 			"Ganapathy Ghanapatah.mp3",
 			"Ganapathy Stotram.mp3",
@@ -74,7 +74,6 @@ namespace Pooja
 			if (currentImage == ganeshPics.Length)
 				currentImage = 0;
 			ImageSwitcher iv = FindViewById<ImageSwitcher> (Resource.Id.switcher);
-			Console.Out.WriteLine ("si ;" + currentImage);
 			iv.SetImageResource (ganeshPics[currentImage]);
 			iv.PostDelayed(atnSwitchImage, SWITHIMAGEDURATION );
 		}
@@ -83,8 +82,9 @@ namespace Pooja
 		{
 			ImageView i = new ImageView (this);
 			//i.SetBackgroundColor (Android.Graphics.Color.Azure);
-			i.SetScaleType (ImageView.ScaleType.FitCenter);
+			i.SetScaleType (ImageView.ScaleType.CenterInside);
 			i.SetAdjustViewBounds (true);
+			//i.LayoutParameters = new ImageSwitcher.LayoutParams(ImageSwitcher.LayoutParams.WrapContent,ImageSwitcher.LayoutParams.WrapContent);
 			i.LayoutParameters = new ImageSwitcher.LayoutParams(ImageSwitcher.LayoutParams.FillParent,ImageSwitcher.LayoutParams.FillParent);
 			return i;
 		}
