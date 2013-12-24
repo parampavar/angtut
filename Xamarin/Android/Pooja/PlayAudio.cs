@@ -13,6 +13,7 @@ using Android.Media;
 using Android.Content.Res;
 
 
+
 namespace Pooja
 {
     //
@@ -21,7 +22,7 @@ namespace Pooja
     {
         MediaPlayer player = null;
 		string[] songs = null;
-		int currentIndex = 0;
+		int currentIndex = -1;
 		Activity parentActivity = null;
 
 		public void strtPlayer (int index)
@@ -30,6 +31,7 @@ namespace Pooja
 			{
                 if (player == null) 
 				{
+					currentIndex = 0;
 					player = new MediaPlayer();
 					player.Completion += (object sender, EventArgs e) => 
 					{
@@ -41,8 +43,13 @@ namespace Pooja
 					};
 					prepareToPlay(currentIndex);
 				}
-				else 
+				else
+				{ 
+					player.Reset();
+					if (currentIndex == songs.Length)
+						currentIndex = 0;
 					prepareToPlay(currentIndex);
+				}
             } catch (Exception ex) {
                 Console.Out.WriteLine (ex.StackTrace);
             }
@@ -52,20 +59,34 @@ namespace Pooja
 		{
 			try
 			{
-				// This method works better than setting the file path in SetDataSource. Don't know why.
-				Console.Out.WriteLine ("playing ;" + songs[index]);
-				AssetFileDescriptor afd = parentActivity.Assets.OpenFd(songs[index]);
-				if ( afd != null )
+				if ( songs.Length > 0 )
 				{
-					player.SetDataSource(afd.FileDescriptor,afd.StartOffset, afd.Length);
-					afd.Close();
-					player.Prepare ();
-					player.Start ();
+					Console.Out.WriteLine ("Playing " + songs[index]);
+					createNotification("Playing " + songs[index]);
+					AssetFileDescriptor afd = parentActivity.Assets.OpenFd(songs[index]);
+					if ( afd != null )
+					{
+						player.SetDataSource(afd.FileDescriptor,afd.StartOffset, afd.Length);
+						afd.Close();
+						player.Prepare ();
+						player.Start ();
+					}
 				}
+				else
+					Console.Out.WriteLine ("Playlist is empty");
+			}
+			catch(Java.IO.FileNotFoundException fnf) {
+				if (fnf.InnerException == null)
+					Console.Out.WriteLine ("Exception:" + fnf.Message);
+				else
+					Console.Out.WriteLine ("Exception:" + fnf.InnerException.Message);
 			}
 			catch(Exception ex)
 			{
-				Console.Out.WriteLine (ex.StackTrace);
+				if (ex.InnerException == null)
+					Console.Out.WriteLine ("Exception:" + ex.Message);
+				else
+					Console.Out.WriteLine ("Exception:" + ex.InnerException.Message);
 			}
 		}
 
@@ -77,6 +98,7 @@ namespace Pooja
                 }
 				player.Reset ();
                 player.Release ();
+				currentIndex = -1;
 				//player = null;
             }
         }
@@ -85,7 +107,8 @@ namespace Pooja
         {
 			this.songs = songs;
 			this.parentActivity = mainActivity;
-			strtPlayer(0);
+			this.currentIndex++;
+			strtPlayer(currentIndex);
         }
 
 		public void Next ()
@@ -99,6 +122,13 @@ namespace Pooja
             this.StopPlayer ();
         }
 
+		public void createNotification(string msg) {
+
+			Notification notification = new Notification(Resource.Drawable.Icon, msg, System.Environment.TickCount);
+			notification.SetLatestEventInfo(this.parentActivity.ApplicationContext, text, msg, null);
+			PoojaNotificationManager.notifyManager.Notify(0, notification);
+
+		}
     }
 
 }

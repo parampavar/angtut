@@ -9,50 +9,50 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tblmain"
-		android:scaleType="fitCenter"
+        android:scaleType="fitCenter"
         android:layout_weight="1">
-		<TableRow
+        <TableRow
             android:id="@+id/tableRow1"
             android:layout_width="fill_parent"
             android:minWidth="25px"
             android:minHeight="25px"
             android:layout_weight=".8">
-			<ImageSwitcher
-				android:id="@+id/switcher"
+            <ImageSwitcher
+                android:id="@+id/switcher"
                 android:layout_width="wrap_content"
                 android:scaleType="centerInside"
-				android:adjustViewBounds="true"
-				android:layout_weight="1" />
-		</TableRow>
-		<TableRow
+                android:adjustViewBounds="true"
+                android:layout_weight="1" />
+        </TableRow>
+        <TableRow
             android:id="@+id/tableRow2"
             android:layout_width="fill_parent"
             android:minWidth="25px"
             android:minHeight="25px"
             android:layout_weight=".2"
             android:gravity="bottom">
-			<TableLayout
+            <TableLayout
                 android:minWidth="25px"
                 android:minHeight="25px"
                 android:layout_column="0"
                 android:layout_width="match_parent"
                 android:layout_weight="1"
-				android:id="@+id/tblButtons">
-				<TableRow
-					android:id="@+id/tblRowButtons"
+                android:id="@+id/tblButtons">
+                <TableRow
+                    android:id="@+id/tblRowButtons"
                     android:layout_weight="1">
-					<Button
-						android:id="@+id/btnStart"
-						android:text="@string/start"
-						android:layout_column="0"
-						android:layout_weight=".5" />
-					<Button
-						android:id="@+id/btnNext"
-						android:text="@string/next"
-						android:layout_column="1"
-						android:layout_weight=".5" />
-				</TableRow>
-			</TableLayout>
-		</TableRow>
-	</TableLayout>
+                    <Button
+                        android:id="@+id/btnNext"
+                        android:text="@string/next"
+                        android:layout_column="0"
+                        android:layout_weight=".5" />
+                    <Button
+                        android:id="@+id/btnStop"
+                        android:text="@string/stop"
+                        android:layout_column="1"
+                        android:layout_weight=".5" />
+                </TableRow>
+            </TableLayout>
+        </TableRow>
+    </TableLayout>
 </LinearLayout>

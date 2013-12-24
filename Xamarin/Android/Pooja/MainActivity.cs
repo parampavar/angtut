@@ -14,19 +14,24 @@ namespace Pooja
 	{
 		int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};
 		//int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha2, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};
-		string[] ganeshSongs = {"Ganapathiye_Varuvaai.mp3",
-			"Ganapathy Ghanapatah.mp3",
-			"Ganapathy Stotram.mp3",
-			"Ganesha Ashtakam.mp3",
-			"Ganesha Dvadasha.mp3",
-			"Ganesha Pancharatna.mp3",
-			"Ganeshanyasaha.mp3",
+//		string[] ganeshSongs = {"Ganapathiye_Varuvaai.mp3",
+//			"Ganapathy Ghanapatah.mp3",
+//			"Ganapathy Stotram.mp3",
+//			"Ganesha Ashtakam.mp3",
+//			"Ganesha Dvadasha.mp3",
+//			"Ganesha Pancharatna.mp3",
+//			"Ganeshanyasaha.mp3",
+//			"neeye_En_Vazhvukku.mp3",
+//			"Vinayagane_Vinaitheerpavane.mp3"
+//		};
+
+		string[] ganeshSongs = {
 			"neeye_En_Vazhvukku.mp3",
 			"Vinayagane_Vinaitheerpavane.mp3"
 		};
 
 		PlayAudio playAudio = new PlayAudio ();
-		NotificationManager nMan = new NotificationManager ();
+		PoojaNotificationManager nMan = new PoojaNotificationManager ();
 
 		Action atnSwitchImage;
 		int currentImage = 0;
@@ -43,14 +48,17 @@ namespace Pooja
 			// Set our view from the "main" layout resource
 			SetContentView (Resource.Layout.Main);
 
-			NotificationManager.audioManager = (AudioManager)GetSystemService (Context.AudioService);
-			NotificationManager.MainActivity = this;
+			PoojaNotificationManager.audioManager = (AudioManager)GetSystemService (Context.AudioService);
+			PoojaNotificationManager.notifyManager = (NotificationManager)GetSystemService (Context.NotificationService);
+			PoojaNotificationManager.MainActivity = this;
 
+			//this.Window.AddFlags (WindowManagerFlags.Fullscreen);
+			this.Window.AddFlags (WindowManagerFlags.KeepScreenOn);
 
-			// Get our button from the layout resource,
-			// and attach an event to it
-			Button button1 = FindViewById<Button> (Resource.Id.btnStart);
-			button1.Click += btnStart_Click;
+			//			Button button1 = FindViewById<Button> (Resource.Id.btnStart);
+			//			button1.Click += btnStart_Click;
+			Button button1 = FindViewById<Button> (Resource.Id.btnStop);
+			button1.Click += btnStop_Click;
 			Button button2 = FindViewById<Button> (Resource.Id.btnNext);
 			button2.Click += btnNext_Click;
 
@@ -81,17 +89,21 @@ namespace Pooja
 		public View MakeView()
 		{
 			ImageView i = new ImageView (this);
-			//i.SetBackgroundColor (Android.Graphics.Color.Azure);
 			i.SetScaleType (ImageView.ScaleType.CenterInside);
 			i.SetAdjustViewBounds (true);
-			//i.LayoutParameters = new ImageSwitcher.LayoutParams(ImageSwitcher.LayoutParams.WrapContent,ImageSwitcher.LayoutParams.WrapContent);
 			i.LayoutParameters = new ImageSwitcher.LayoutParams(ImageSwitcher.LayoutParams.FillParent,ImageSwitcher.LayoutParams.FillParent);
+
 			return i;
 		}
 
 		public void btnStart_Click(object sender, EventArgs e)
 		{
 			startOperation (ganeshSongs);
+		}
+
+		public void btnStop_Click(object sender, EventArgs e)
+		{
+			stop ();
 		}
 
 		public void btnNext_Click(object sender, EventArgs e)
@@ -106,9 +118,18 @@ namespace Pooja
 		}
 		void nextSong ()
 		{
-			if ( playAudio == null )
-				playAudio = new PlayAudio ();
-			playAudio.Next ();
+			if (playAudio == null) {
+				btnStart_Click (null, null);
+			}
+			else
+				playAudio.Next ();
+		}
+		void stop ()
+		{
+			if (playAudio != null) {
+				playAudio.Stop ();
+				playAudio = null;
+			}
 		}
 	}
 }

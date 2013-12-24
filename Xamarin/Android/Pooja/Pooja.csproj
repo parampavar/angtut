@@ -51,9 +51,9 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NotificationManager.cs" />
     <Compile Include="PlayAudio.cs" />
     <Compile Include="INotificationReceiver.cs" />
+    <Compile Include="PoojaNotificationManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -75,5 +75,9 @@
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Resources\drawable\Ganesha\" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\neeye_En_Vazhvukku.mp3" />
+    <AndroidAsset Include="Assets\Vinayagane_Vinaitheerpavane.mp3" />
   </ItemGroup>
 </Project>

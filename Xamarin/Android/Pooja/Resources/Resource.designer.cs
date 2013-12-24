@@ -81,11 +81,11 @@ namespace Pooja
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f050007
-			public const int btnNext = 2131034119;
-			
 			// aapt resource value: 0x7f050006
-			public const int btnStart = 2131034118;
+			public const int btnNext = 2131034118;
+			
+			// aapt resource value: 0x7f050007
+			public const int btnStop = 2131034119;
 			
 			// aapt resource value: 0x7f050002
 			public const int switcher = 2131034114;
@@ -141,7 +141,7 @@ namespace Pooja
 			public const int next = 2130968577;
 			
 			// aapt resource value: 0x7f040000
-			public const int start = 2130968576;
+			public const int stop = 2130968576;
 			
 			static String()
 			{

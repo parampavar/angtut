@@ -16,9 +16,11 @@ namespace Pooja
     //
     // Class used to manage audio notifications.
     //
-    class NotificationManager
+    class PoojaNotificationManager
     {
         static public AudioManager audioManager = null;
+		static public NotificationManager notifyManager = null;
+
         static Activity mainActivity = null;
 
         public static Activity MainActivity {
