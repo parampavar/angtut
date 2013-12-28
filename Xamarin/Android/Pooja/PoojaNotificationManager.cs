@@ -11,12 +11,13 @@ using Android.Views;
 using Android.Widget;
 using Android.Media;
 
+
 namespace Pooja
 {
     //
     // Class used to manage audio notifications.
     //
-    class PoojaNotificationManager
+	class PoojaNotificationManager
     {
         static public AudioManager audioManager = null;
 		static public NotificationManager notifyManager = null;
@@ -25,6 +26,7 @@ namespace Pooja
 
         public static Activity MainActivity {
             set { mainActivity = value; }
+
         }
 
         AudioManager.IOnAudioFocusChangeListener listener = null;

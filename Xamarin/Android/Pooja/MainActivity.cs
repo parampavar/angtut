@@ -10,6 +10,8 @@ using Android.Media;
 namespace Pooja
 {
 	[Activity (Label = "Pooja", MainLauncher = true)]
+	[BroadcastReceiver]
+	[IntentFilter( new [] { "android.intent.action.PHONE_STATE" })]
 	public class MainActivity : Activity, ViewSwitcher.IViewFactory
 	{
 		int[] ganeshPics = {Resource.Drawable.Ganesha1, Resource.Drawable.Ganesha3, Resource.Drawable.Ganesha4, Resource.Drawable.Ganesha5, Resource.Drawable.Ganesha6, Resource.Drawable.Ganesha7};

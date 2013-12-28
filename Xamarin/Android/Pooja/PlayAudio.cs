@@ -12,18 +12,38 @@ using Android.Widget;
 using Android.Media;
 using Android.Content.Res;
 
-
+using Android.Telephony;
 
 namespace Pooja
 {
     //
     // Shows how to use the MediaPlayer class to play audio.
-	class PlayAudio : INotificationReceiver
+	class PlayAudio : BroadcastReceiver, INotificationReceiver
     {
         MediaPlayer player = null;
 		string[] songs = null;
 		int currentIndex = -1;
 		Activity parentActivity = null;
+
+		public override void OnReceive(Context context, Intent intent)
+		{
+			// ensure there is information
+			if (intent.Extras != null)
+			{
+				// get the incoming call state
+				string state = intent.GetStringExtra(TelephonyManager.ExtraState);
+
+				// check the current state
+				if ((state == TelephonyManager.ExtraStateRinging || state == TelephonyManager.ExtraStateOffhook) && player.IsPlaying)
+				{
+					player.Pause ();
+				}
+				else if (state == TelephonyManager.ExtraStateIdle)
+				{
+					player.Start ();
+				}
+			}
+		}
 
 		public void strtPlayer (int index)
         {
@@ -125,7 +145,10 @@ namespace Pooja
 		public void createNotification(string msg) {
 
 			Notification notification = new Notification(Resource.Drawable.Icon, msg, System.Environment.TickCount);
-			notification.SetLatestEventInfo(this.parentActivity.ApplicationContext, text, msg, null);
+			//Java.Lang.ICharSequence chAppName = Resources.System.GetText(Resource.String.app_name);
+			//Java.Lang.ICharSequence chMsg = msg.AsEnumerable<char> ();
+
+			notification.SetLatestEventInfo(this.parentActivity.ApplicationContext, "Pooja", msg, null);
 			PoojaNotificationManager.notifyManager.Notify(0, notification);
 
 		}
