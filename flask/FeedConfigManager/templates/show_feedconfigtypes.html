@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+	<form action="{{ url_for('add_feedconfigtype') }}" method=post class=add-feedconfigtype>
+	  <dl>
+		<dt>name:
+		<dd><input type=text size=30 name=name>
+		<dt>type:
+		<dd><input type=text size=30 name=type>
+		<dt>description:
+		<dd><input type=text size=30 name=description>
+		<dt>createdby:
+		<dd><input type=text size=30 name=createdby>
+		<dt>updatedby:
+		<dd><input type=text size=30 name=updatedby>
+		
+		<dd><input type=submit value=Add>
+	  </dl>
+	</form>
+  <table class=table>
+	<tr><td>Name</td><td>Description</td><td>Type</td><td>Created By</td><td>Updated By</td><td>Edit Layout</td></tr>
+  {% for feedconfigtype in feedconfigtypes %}
+    <tr><td>{{feedconfigtypes[feedconfigtype].name}}</td><td>{{feedconfigtypes[feedconfigtype].description}}</td><td>{{feedconfigtypes[feedconfigtype].type}}</td><td>{{feedconfigtypes[feedconfigtype].createdby}}</td><td>{{feedconfigtypes[feedconfigtype].updatedby}}</td><td><a href="{{ url_for('show_feedconfigtype_layout', type_name=feedconfigtypes[feedconfigtype].type) }}">Layout</a> </td></tr>
+  {% endfor %}
+  </table>
+  
+{% endblock %}
