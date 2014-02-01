@@ -116,7 +116,9 @@ namespace Pooja
 		void startOperation (string[] songs)
 		{
 			playAudio = new PlayAudio ();
-			playAudio.Start (this, songs);
+			bool haveFocus = nMan.RequestAudioResources (this, playAudio);
+			if ( haveFocus)
+				playAudio.Start (this, songs);
 		}
 		void nextSong ()
 		{

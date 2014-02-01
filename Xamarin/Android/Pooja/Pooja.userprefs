@@ -1,18 +1,22 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="MainActivity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlayAudio.cs">
     <Files>
-      <File FileName="MainActivity.cs" Line="89" Column="4" />
+      <File FileName="MainActivity.cs" Line="1" Column="1" />
       <File FileName="Resources\values\Strings.xml" Line="1" Column="1" />
-      <File FileName="PlayAudio.cs" Line="96" Column="4" />
-      <File FileName="NotificationManager.cs" Line="1" Column="1" />
+      <File FileName="PlayAudio.cs" Line="54" Column="3" />
+      <File FileName="PoojaNotificationManager.cs" Line="22" Column="35" />
       <File FileName="INotificationReceiver.cs" Line="1" Column="1" />
-      <File FileName="Properties\AssemblyInfo.cs" Line="29" Column="1" />
+      <File FileName="Properties\AssemblyInfo.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="C:\Working\Github\angtut\Xamarin\Android\Pooja\MainActivity.cs" line="108" column="1" />
+      <Breakpoint file="C:\Working\Github\angtut\Xamarin\Android\Pooja\PlayAudio.cs" line="44" column="1" />
+      <Breakpoint file="C:\Working\Github\angtut\Xamarin\Android\Pooja\PoojaNotificationManager.cs" line="86" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.Pooja AndroidDeviceId-Debug="emulator-5554" MonoForAntroid.PreferredDevice="3.7in WVGA (Nexus One)" />
+  <MonoDevelop.Ide.ItemProperties.Pooja MonoForAntroid.PreferredDevice="3.7in WVGA (Nexus One)" AndroidDeviceId-Debug="emulator-5554" />
 </Properties>

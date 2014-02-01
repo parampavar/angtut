@@ -18,32 +18,39 @@ namespace Pooja
 {
     //
     // Shows how to use the MediaPlayer class to play audio.
-	class PlayAudio : BroadcastReceiver, INotificationReceiver
-    {
+	//	[BroadcastReceiver()]
+	//[IntentFilter(new[] { "android.intent.action.PHONE_STATE" })]
+	//class PlayAudio : BroadcastReceiver, INotificationReceiver
+	class PlayAudio : INotificationReceiver
+	   {
         MediaPlayer player = null;
 		string[] songs = null;
 		int currentIndex = -1;
 		Activity parentActivity = null;
 
-		public override void OnReceive(Context context, Intent intent)
-		{
-			// ensure there is information
-			if (intent.Extras != null)
-			{
-				// get the incoming call state
-				string state = intent.GetStringExtra(TelephonyManager.ExtraState);
-
-				// check the current state
-				if ((state == TelephonyManager.ExtraStateRinging || state == TelephonyManager.ExtraStateOffhook) && player.IsPlaying)
-				{
-					player.Pause ();
-				}
-				else if (state == TelephonyManager.ExtraStateIdle)
-				{
-					player.Start ();
-				}
-			}
-		}
+//		public override void OnReceive(Context context, Intent intent)
+//		{
+//			// ensure there is information
+//			if (intent.Extras != null)
+//			{
+//				// get the incoming call state
+//				string state = intent.GetStringExtra(TelephonyManager.ExtraState);
+//				if (this.player == null)
+//					Console.Out.WriteLine ("player is null");
+//				if (state == null)
+//					Console.Out.WriteLine ("state is null");
+//
+//				// check the current state
+//				if ((state == TelephonyManager.ExtraStateRinging || state == TelephonyManager.ExtraStateOffhook) && this.player.IsPlaying)
+//				{
+//					this.player.Pause ();
+//				}
+//				else if (state == TelephonyManager.ExtraStateIdle)
+//				{
+//					this.player.Start ();
+//				}
+//			}
+//		}
 
 		public void strtPlayer (int index)
         {

@@ -37,10 +37,10 @@ namespace Pooja
 			string fileName = null;
 			Activity mainActivity;
 
-			public FocusChangeListener (Activity mainActivity, INotificationReceiver parent, string fileName)
+			public FocusChangeListener (Activity mainActivity, INotificationReceiver parent)
             {
                 this.parent = parent;
-				this.fileName = fileName;
+				//this.fileName = fileName;
 				this.mainActivity = mainActivity;
             }
 
@@ -68,9 +68,9 @@ namespace Pooja
             }
         }
 
-		public Boolean RequestAudioResources (Activity mainActivity, INotificationReceiver parent, string fileName)
+		public Boolean RequestAudioResources (Activity mainActivity, INotificationReceiver parent)
         {
-			listener = new FocusChangeListener ( mainActivity, parent, fileName);
+			listener = new FocusChangeListener ( mainActivity, parent);
 
             var ret = audioManager.RequestAudioFocus (listener, Stream.Music, AudioFocus.Gain);
             if (ret == AudioFocusRequest.Granted) {
