@@ -1,8 +1,8 @@
-from couchbase import Couchbase
-from couchbase.exceptions import CouchbaseError
-from couchbase.exceptions import KeyExistsError, NotFoundError
-from couchbase.views.iterator import RowProcessor
-from couchbase.views.params import UNSPEC, Query
+#from couchbase import Couchbase
+#from couchbase.exceptions import CouchbaseError
+#from couchbase.exceptions import KeyExistsError, NotFoundError
+#from couchbase.views.iterator import RowProcessor
+#from couchbase.views.params import UNSPEC, Query
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask import redirect, send_from_directory
@@ -35,7 +35,8 @@ FeedDefinitions= {'CUSTOMER': {'type': 'CUSTOMER', 'rowschema': CustomerFileRowS
 
 		  
 def connect_db():
-	return Couchbase.connect(bucket=app.config['DATABASE'])
+#	return Couchbase.connect(bucket=app.config['DATABASE'])
+	return None
 
 def get_db():
     if not hasattr(g, 'couch_db'):
@@ -58,15 +59,15 @@ def show_feedconfigtype_layout(type_name):
 	currentrowschema = {}
 	linekeyfound = False
 	configtype = {}
-	try:
-		dictline = g.db.get(linekey).value
-		configtype = dictline['CONFIGS'][type_name]
-		if 'rowschema' in configtype:
-			currentrowschema = configtype['rowschema']
-		linekeyfound = True
+#	try:
+	dictline = g.db.get(linekey).value
+	configtype = dictline['CONFIGS'][type_name]
+	if 'rowschema' in configtype:
+		currentrowschema = configtype['rowschema']
+	linekeyfound = True
 		#pass
-	except CouchbaseError as e:
-		print ( "show_feedconfigtype_layout: Exception: " + str(e.key))
+#	except CouchbaseError as e:
+#		print ( "show_feedconfigtype_layout: Exception: " + str(e.key))
 		
 	return render_template('show_feedconfigtype_layout.html', type=type_name, currentrowschema=currentrowschema, rowschematemplate=SurgeonFileRowSchema)	
 	
@@ -111,13 +112,13 @@ def add_feedconfigtype():
 	
 	linekeyfound = False
 	configtypes = {}
-	try:
-		dictline = g.db.get(linekey).value
-		configtypes = dictline['CONFIGS']
-		linekeyfound = True
-		#pass
-	except CouchbaseError as e:
-		print ( "add_feedconfigtype: Exception: " + str(e.key))
+#	try:
+	dictline = g.db.get(linekey).value
+	configtypes = dictline['CONFIGS']
+	linekeyfound = True
+	#pass
+#	except CouchbaseError as e:
+#		print ( "add_feedconfigtype: Exception: " + str(e.key))
 
 	configtypes[request.form['type']] = currentfeedConfig
 		
@@ -126,10 +127,10 @@ def add_feedconfigtype():
 	dictline['keylayout'] = linekeylayout
 	dictline['CONFIGS'] = configtypes
 
-	try:
-		g.db.set(linekey, dictline)
-	except CouchbaseError as e:
-		print ( "add_feedconfigtype: Exception: " + str(e.key))
+#	try:
+	g.db.set(linekey, dictline)
+#	except CouchbaseError as e:
+#		print ( "add_feedconfigtype: Exception: " + str(e.key))
 		
 	flash('New entry was successfully added')
 	return redirect(url_for('show_feedconfigtypes'))

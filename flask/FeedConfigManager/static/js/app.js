@@ -52,9 +52,11 @@ function MainCntl($route, $routeParams, $location) {
 }
 
 function FeedConfigTypeListController($routeParams, $scope) {
-	alert("Inside FeedConfigTypeListController Controller");
-	var postsQuery = $.getJSON("http://localhost:3000/default/1|FEEDCONFIG", function(data) {
-		$scope.feedconfigtypes = data;
+	$.ajaxSetup({ cache: false });
+	$.getJSON('http://localhost:3000/default/1|FEEDCONFIG', function(jd) {
+		alert(jd);
+		//$scope.feedconfigtypes = data;
 	});
+	alert('aaa');
 	
 }
