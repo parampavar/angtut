@@ -5,6 +5,8 @@ from couchbase.views.iterator import RowProcessor
 from couchbase.views.params import UNSPEC, Query
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import redirect, send_from_directory
+from flask import send_file, make_response
 
 from datetime import datetime
 	 
@@ -44,6 +46,7 @@ def get_db():
 @app.before_request
 def before_request():
 	g.db = connect_db()
+
 	
 @app.route('/feedconfigtype/layout/<type_name>')
 def show_feedconfigtype_layout(type_name):
@@ -67,22 +70,33 @@ def show_feedconfigtype_layout(type_name):
 		
 	return render_template('show_feedconfigtype_layout.html', type=type_name, currentrowschema=currentrowschema, rowschematemplate=SurgeonFileRowSchema)	
 	
+#@app.route('/feedconfigtype')
+#def show_feedconfigtypes():
+#	key = '1|FEEDCONFIG'
+#	configs = {}
+#	try:
+#		configtypes = g.db.get(key).value
+#		if 'CONFIGS' in configtypes:
+#			configs = configtypes['CONFIGS']
+#			#print(configs['SURGEON'])
+#			for feedconfigtype in configs:
+#				print(url_for('show_feedconfigtype_layout', type_name=configs[feedconfigtype]['type']))
+#	except CouchbaseError as e:
+#		print ( "deleteLine: Exception: " + str(e.key))	
+#	
+#	return render_template('show_feedconfigtypes.html', feedconfigtypes=configs)	
+	
+# routing for basic pages (pass routing onto the Angular app)
+@app.route('/')
+@app.route('/about')
+@app.route('/blog')
+def basic_pages(**kwargs):
+	return make_response(open('templates/index.html').read())
+
 @app.route('/feedconfigtype')
 def show_feedconfigtypes():
-	key = '1|FEEDCONFIG'
-	configs = {}
-	try:
-		configtypes = g.db.get(key).value
-		if 'CONFIGS' in configtypes:
-			configs = configtypes['CONFIGS']
-			#print(configs['SURGEON'])
-			for feedconfigtype in configs:
-				print(url_for('show_feedconfigtype_layout', type_name=configs[feedconfigtype]['type']))
-	except CouchbaseError as e:
-		print ( "deleteLine: Exception: " + str(e.key))	
-	
-	return render_template('show_feedconfigtypes.html', feedconfigtypes=configs)	
-	
+	return make_response(open('templates/index.html').read())
+
 	
 @app.route('/feedconfigtype/add', methods=['POST'])
 def add_feedconfigtype():
