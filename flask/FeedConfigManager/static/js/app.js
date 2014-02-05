@@ -16,7 +16,7 @@ function AlertDemoCtrl($scope) {
 
 }
 */
-angular.module('FeedConfigManager', ['ngRoute'], 
+angular.module('FeedConfigManager', ['ngRoute', 'ngGrid'], 
 	function($routeProvider, $locationProvider) {
 	$routeProvider.when('/', {
 //		templateUrl: 'static/partials/show_feedconfigtypes.html',
@@ -52,11 +52,171 @@ function MainCntl($route, $routeParams, $location) {
 }
 
 function FeedConfigTypeListController($routeParams, $scope) {
+	$scope.abcd = 'Param';
+	$scope.feedconfigtypes = {};
+	$scope.feedConfigTypeGridOptions = {};
+	$scope.feedconfigtypesarr = {};
 	$.ajaxSetup({ cache: false });
-	$.getJSON('http://localhost:3000/default/1|FEEDCONFIG', function(jd) {
-		alert(jd);
-		//$scope.feedconfigtypes = data;
-	});
-	alert('aaa');
 	
+	var jfct = { "updatedby":"", "description":"", "type":"", "createdby":"", "name":"" };
+	pluginArrayArg = jQuery.map( jfct, function( a ) {
+		return a;
+	});
+	$scope.feedconfigtypes = jfct;
+	$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
+	
+
+ 
+	
+	try
+	{
+	$.getJSON('http://localhost:3000/default/1|FEEDCONFIG', function(data) {
+	//$.getJSON('http://localhost:3000/default/1|FEEDCONFIG?callback=?', function() {
+		//console.log("success");
+		//console.log(data);
+	})
+	.done(function(jd) {
+		$scope.$apply(function(){
+			$scope.abcd = 'Param Pavar';
+			
+			$scope.feedconfigtypes = jd.document['CONFIGS'];
+			pluginArrayArg = jQuery.map( $scope.feedconfigtypes, function( a ) {
+				return a;
+			});
+			console.log('$scope.feedconfigtypes');
+			console.log($scope.feedconfigtypes);
+			console.log('$scope.feedconfigtypesarr');
+			console.log($scope.feedconfigtypesarr);
+			$scope.feedconfigtypes = pluginArrayArg;
+			$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
+			
+	/*
+	var jfct = { "CUSTOMER":{ "updatedby":"Koochi", "description":"Customer Feed file2", "type":"CUSTOMER", "createdby":"Param", "name":"CUSTOMER" }, "SURGEON":{ "name":"SURGEON", "createdby":"Param", "type":"SURGEON", "updatedby":"Param", "description":"Surgeon Master File" } };
+	pluginArrayArg = jQuery.map( jfct, function( a ) {
+		return a;
+	});
+	// var jsonstr = JSON.stringify(pluginArrayArg);
+	// var jsonArr = JSON.parse(jsonstr);
+	console.log('jfct');
+	console.log(jfct);
+	console.log('pluginArrayArg');
+	console.log(pluginArrayArg);
+	// console.log('jsonstr');
+	// console.log(jsonstr);
+	// console.log('jsonArr');
+	// console.log(jsonArr);
+	$scope.feedconfigtypes = pluginArrayArg;
+	$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
+	*/
+        });	
+	})
+	.fail(function() {
+		console.log("error");
+	})
+	.always(function() {
+		console.log("complete");
+	});
+	}
+	catch(ex)
+	{
+		console.log(ex)
+	}
+	
+	/*
+	console.log(">>>>>>>>>>>>>>>");
+	(function($) {
+		var url = 'http://www.jquery4u.com/scripts/jquery4u.settings.json';	
+		url = 'http://api.stackoverflow.com/1.0/tags/';
+		url = 'http://localhost:3000/default/1|FEEDCONFIG';
+		$.ajax({
+			type:'GET', dataType:'jsonp', 
+			jsonp:'onJSONPLoad', jsonpCallback:'aaaa',
+			url: url,
+			//success:function(data) {
+			//	alert(data);
+			//},
+			error:function(jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR.readyState);
+				console.log(jqXHR.status);
+				console.log(jqXHR.statusText);
+				console.log(jqXHR.responseXML);
+				console.log(jqXHR.responseText);
+				console.log("Sorry, I can't get the feed");  
+			},
+			complete:function() {console.log("Completed"); }
+		});
+	})(jQuery);	
+	console.log("<<<<<<<<<<<<<<");
+	*/
+	/*
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', url, true); //Open the XHR request. Will be sent later
+	xhr.onreadystatechange = function (event) {
+		pm.request.response.load(event.target);
+	};
+	*/
+//	alert('post');
+
+/*
+	console.log(">>>>>>>>>>>>>>>");
+	makeCorsRequest();
+	console.log("<<<<<<<<<<<<<<");
+*/
+}
+
+
+// Create the XHR object.
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // XHR for Chrome/Firefox/Opera/Safari.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // XDomainRequest for IE.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
+}
+
+
+// Make the actual CORS request.
+function makeCorsRequest() {
+  // All HTML5 Rocks properties support CORS.
+  var url = 'http://updates.html5rocks.com';
+  url = 'http://localhost:3000/default/1|FEEDCONFIG?callback=?';
+
+  var xhr = createCORSRequest('GET', url);
+  if (!xhr) {
+    console.log('CORS not supported');
+    return;
+  }
+
+  // Response handlers.
+  xhr.onreadystatechange  = function(evtXHR) {
+		if (xhr.readyState == 4)
+        {
+			console.log("xhr.status=" + xhr.status);
+                if (xhr.status == 200)
+                {
+                    //var response = xhr.responseXML;
+					console.log("responseXML =" + xhr.responseXML);
+					console.log("responseText =" + xhr.responseText);
+                }
+                else
+                    console.log("xhr Errors Occured");
+        }
+        else
+            console.log("currently the application is at" + xhr.readyState);
+	console.log('Response from CORS request to ' + url + ': ');
+  };
+
+  xhr.onerror = function() {
+    console.log('Woops, there was an error making the request.');
+  };
+
+  xhr.send();
 }

@@ -7,18 +7,20 @@
 	<link rel="stylesheet" href="/static/css/style.css">
 	<link rel="stylesheet" href="/static/css/bootstrap/bootstrap.css">
 	<link rel="stylesheet" href="/static/css/font-awesome/4.0.3/font-awesome.css">
+	<link rel="stylesheet" href="/static/css/ng-grid/ng-grid.css">
 	<link rel="stylesheet" href="/static/css/main.css">
 
+	<script src="/static/lib/jquery/jquery-2.1.0.js"></script>
 	<script src="/static/lib/angular/1.2.10/angular.js"></script>
 	<script src="/static/lib/angular/1.2.10/angular-route.js"></script>
 	<script src="/static/lib/angular-bootstrap-ui/ui-bootstrap-tpls-0.10.0.js"></script>
 	<script src="/static/lib/bootstrap/bootstrap.js"></script>
+	<script src="/static/lib/angular-ng-grid/ng-grid.js"></script>
 
 	<script src="/static/js/app.js"></script>
 	<script src="/static/js/controllers.js"></script>
  	<script src="/static/js/services.js"></script>
 
-	<script src="/static/lib/jquery/jquery-2.1.0.js"></script>
 </head>
 <body>
 	<div ng-controller="MainCntl as main">
@@ -39,17 +41,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="container page">
+		<div class="container">
 			<div id="content" class="container main" ng-view>
 			</div>
 
-		  <hr>
-		  <pre>$scope.abcd = {{$scope.abcd}}</pre>
-		  <pre>$location.path() = {{main.$location.path()}}</pre>
-		  <pre>$route.current.templateUrl = {{main.$route.current.templateUrl}}</pre>
-		  <pre>$route.current.params = {{main.$route.current.params}}</pre>
-		  <pre>$route.current.scope.name = {{main.$route.current.scope.name}}</pre>
-		  <pre>$routeParams = {{main.$routeParams}}</pre>
 		  <hr>
 			<footer id="footer" class="footer">
 				<div class="footer-left">
