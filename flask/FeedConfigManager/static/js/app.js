@@ -32,6 +32,10 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid'],
 		templateUrl: 'static/partials/show_feedconfigtypes.html',
 		controller: FeedConfigTypeListController
 	});
+	$routeProvider.when('/feedconfigtype/layout/:type_name', {
+		templateUrl: 'static/partials/show_feedconfigtype_layout.html',
+		controller: FeedConfigTypeLayoutController
+	});
 	$routeProvider.when('/feedconfigtype/:postId', {
 		templateUrl: '/static/partials/post-detail.html',
 		controller: PostDetailController
@@ -51,21 +55,31 @@ function MainCntl($route, $routeParams, $location) {
   this.$routeParams = $routeParams;
 }
 
+function FeedConfigTypeLayoutController($routeParams, $scope) {
+}
+
 function FeedConfigTypeListController($routeParams, $scope) {
-	$scope.abcd = 'Param';
 	$scope.feedconfigtypes = {};
 	$scope.feedConfigTypeGridOptions = {};
-	$scope.feedconfigtypesarr = {};
 	$.ajaxSetup({ cache: false });
 	
 	var jfct = { "updatedby":"", "description":"", "type":"", "createdby":"", "name":"" };
-	pluginArrayArg = jQuery.map( jfct, function( a ) {
+	feedConfigTypesArray = jQuery.map( jfct, function( a ) {
 		return a;
 	});
 	$scope.feedconfigtypes = jfct;
-	$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
-	
 
+	$scope.feedConfigTypeGridOptions = { 
+		data: 'feedconfigtypes',
+		multiSelect: false,
+        columnDefs: [
+			{field:'type', displayName:'Type'}, 
+			{field:'name', displayName:'Name'}, 
+			{field:'description', displayName:'Description'}, 
+			{field:'createdby', displayName:'Created By'},
+			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a ng-href="/#/feedconfigtype/layout/{{row.entity.type}}">Edit</a></div>'}
+			]
+		};
  
 	
 	try
@@ -80,32 +94,28 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			$scope.abcd = 'Param Pavar';
 			
 			$scope.feedconfigtypes = jd.document['CONFIGS'];
-			pluginArrayArg = jQuery.map( $scope.feedconfigtypes, function( a ) {
+			feedConfigTypesArray = jQuery.map( $scope.feedconfigtypes, function( a ) {
 				return a;
 			});
-			console.log('$scope.feedconfigtypes');
-			console.log($scope.feedconfigtypes);
-			console.log('$scope.feedconfigtypesarr');
-			console.log($scope.feedconfigtypesarr);
-			$scope.feedconfigtypes = pluginArrayArg;
+			$scope.feedconfigtypes = feedConfigTypesArray;
 			$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
 			
 	/*
 	var jfct = { "CUSTOMER":{ "updatedby":"Koochi", "description":"Customer Feed file2", "type":"CUSTOMER", "createdby":"Param", "name":"CUSTOMER" }, "SURGEON":{ "name":"SURGEON", "createdby":"Param", "type":"SURGEON", "updatedby":"Param", "description":"Surgeon Master File" } };
-	pluginArrayArg = jQuery.map( jfct, function( a ) {
+	feedConfigTypesArray = jQuery.map( jfct, function( a ) {
 		return a;
 	});
-	// var jsonstr = JSON.stringify(pluginArrayArg);
+	// var jsonstr = JSON.stringify(feedConfigTypesArray);
 	// var jsonArr = JSON.parse(jsonstr);
 	console.log('jfct');
 	console.log(jfct);
-	console.log('pluginArrayArg');
-	console.log(pluginArrayArg);
+	console.log('feedConfigTypesArray');
+	console.log(feedConfigTypesArray);
 	// console.log('jsonstr');
 	// console.log(jsonstr);
 	// console.log('jsonArr');
 	// console.log(jsonArr);
-	$scope.feedconfigtypes = pluginArrayArg;
+	$scope.feedconfigtypes = feedConfigTypesArray;
 	$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
 	*/
         });	

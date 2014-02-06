@@ -49,27 +49,27 @@ def before_request():
 	g.db = connect_db()
 
 	
-@app.route('/feedconfigtype/layout/<type_name>')
-def show_feedconfigtype_layout(type_name):
-	linekey = '1|FEEDCONFIG'
-	linekeylayout = 'tenantid|FEEDCONFIG'
-	dictline = {}
-	currentfeedConfig = {}
-						
-	currentrowschema = {}
-	linekeyfound = False
-	configtype = {}
+#@app.route('/feedconfigtype/layout/<type_name>')
+#def show_feedconfigtype_layout(type_name):
+#	linekey = '1|FEEDCONFIG'
+#	linekeylayout = 'tenantid|FEEDCONFIG'
+#	dictline = {}
+#	currentfeedConfig = {}
+#						
+#	currentrowschema = {}
+#	linekeyfound = False
+#	configtype = {}
 #	try:
-	dictline = g.db.get(linekey).value
-	configtype = dictline['CONFIGS'][type_name]
-	if 'rowschema' in configtype:
-		currentrowschema = configtype['rowschema']
-	linekeyfound = True
+#	dictline = g.db.get(linekey).value
+#	configtype = dictline['CONFIGS'][type_name]
+#	if 'rowschema' in configtype:
+#		currentrowschema = configtype['rowschema']
+#	linekeyfound = True
 		#pass
 #	except CouchbaseError as e:
 #		print ( "show_feedconfigtype_layout: Exception: " + str(e.key))
 		
-	return render_template('show_feedconfigtype_layout.html', type=type_name, currentrowschema=currentrowschema, rowschematemplate=SurgeonFileRowSchema)	
+#	return render_template('show_feedconfigtype_layout.html', type=type_name, currentrowschema=currentrowschema, rowschematemplate=SurgeonFileRowSchema)	
 	
 #@app.route('/feedconfigtype')
 #def show_feedconfigtypes():
@@ -95,6 +95,7 @@ def basic_pages(**kwargs):
 	return make_response(open('templates/index.html').read())
 
 @app.route('/feedconfigtype')
+@app.route('/feedconfigtype/layout/<type_name>')
 def show_feedconfigtypes():
 	return make_response(open('templates/index.html').read())
 
