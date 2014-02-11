@@ -1,0 +1,25 @@
+{
+  "keylayout": "tenantid|FEEDCONFIG",
+  "insertdatetime": "2014-01-29T01:16:17.389543",
+  "tenantid": 1,
+  "CONFIGS": {
+    "CUSTOMER": {
+      "updatedatetime": "2014-01-29T01:16:17.389543",
+      "updatedby": "Param",
+      "description": "Customer Feed file2",
+      "type": "CUSTOMER",
+      "createdby": "Param",
+      "name": "CUSTOMER",
+      "insertdatetime": "2014-01-29T01:16:17.389543"
+    },
+    "SURGEON": {
+      "updatedatetime": "2014-01-29T00:36:05.318110",
+      "name": "SURGEON",
+      "createdby": "Param",
+      "type": "SURGEON",
+      "updatedby": "Param",
+      "insertdatetime": "2014-01-29T00:36:05.318110",
+      "description": "Surgeon Master File"
+    }
+  }
+}
