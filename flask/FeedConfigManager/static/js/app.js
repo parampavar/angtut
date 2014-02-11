@@ -16,7 +16,7 @@ function AlertDemoCtrl($scope) {
 
 }
 */
-angular.module('FeedConfigManager', ['ngRoute', 'ngGrid'], 
+angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'], 
 	function($routeProvider, $locationProvider) {
 	$routeProvider.when('/', {
 //		templateUrl: 'static/partials/show_feedconfigtypes.html',
@@ -56,11 +56,13 @@ function MainCntl($route, $routeParams, $location) {
 }
 
 function FeedConfigTypeLayoutController($routeParams, $scope) {
-	$scope.feedconfigtypelayout = {};
-	$scope.feedConfigTypeLayoutAvailableGridOptions = {};
-	$scope.feedConfigTypeLayoutSelectedGridOptions = {};
+	// $scope.feedconfigtypelayout = {};
+	// $scope.feedConfigTypeLayoutAvailableGridOptions = {};
+	// $scope.feedConfigTypeLayoutSelectedGridOptions = {};
 	
+	console.log("routeParams=" + $routeParams);
 	
+	// getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }
 
 function FeedConfigTypeListController($routeParams, $scope) {
@@ -86,44 +88,29 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			]
 		};
  
+	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeList);
 	
+/*
+	console.log(">>>>>>>>>>>>>>>");
+	makeCorsRequest();
+	console.log("<<<<<<<<<<<<<<");
+*/
+}
+
+
+function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
 	try
 	{
-	$.getJSON('http://localhost:3000/default/1|FEEDCONFIG', function(data) {
+	$.getJSON('http://localhost:3000/default/' + key, function(data) {
+	//$.getJSON('http://localhost:3000/default/1|FEEDCONFIG', function(data) {
 	//$.getJSON('http://localhost:3000/default/1|FEEDCONFIG?callback=?', function() {
 		//console.log("success");
 		//console.log(data);
 	})
+	// .done(callback($routeParams, $scope, data))
 	.done(function(jd) {
-		$scope.$apply(function(){
-			$scope.abcd = 'Param Pavar';
-			
-			$scope.feedconfigtypes = jd.document['CONFIGS'];
-			feedConfigTypesArray = jQuery.map( $scope.feedconfigtypes, function( a ) {
-				return a;
-			});
-			$scope.feedconfigtypes = feedConfigTypesArray;
-			$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
-			
-	/*
-	var jfct = { "CUSTOMER":{ "updatedby":"Koochi", "description":"Customer Feed file2", "type":"CUSTOMER", "createdby":"Param", "name":"CUSTOMER" }, "SURGEON":{ "name":"SURGEON", "createdby":"Param", "type":"SURGEON", "updatedby":"Param", "description":"Surgeon Master File" } };
-	feedConfigTypesArray = jQuery.map( jfct, function( a ) {
-		return a;
-	});
-	// var jsonstr = JSON.stringify(feedConfigTypesArray);
-	// var jsonArr = JSON.parse(jsonstr);
-	console.log('jfct');
-	console.log(jfct);
-	console.log('feedConfigTypesArray');
-	console.log(feedConfigTypesArray);
-	// console.log('jsonstr');
-	// console.log(jsonstr);
-	// console.log('jsonArr');
-	// console.log(jsonArr);
-	$scope.feedconfigtypes = feedConfigTypesArray;
-	$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
-	*/
-        });	
+		//console.log(jd);
+		callback($routeParams, $scope, jd);
 	})
 	.fail(function() {
 		console.log("error");
@@ -136,49 +123,26 @@ function FeedConfigTypeListController($routeParams, $scope) {
 	{
 		console.log(ex)
 	}
-	
-	/*
-	console.log(">>>>>>>>>>>>>>>");
-	(function($) {
-		var url = 'http://www.jquery4u.com/scripts/jquery4u.settings.json';	
-		url = 'http://api.stackoverflow.com/1.0/tags/';
-		url = 'http://localhost:3000/default/1|FEEDCONFIG';
-		$.ajax({
-			type:'GET', dataType:'jsonp', 
-			jsonp:'onJSONPLoad', jsonpCallback:'aaaa',
-			url: url,
-			//success:function(data) {
-			//	alert(data);
-			//},
-			error:function(jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR.readyState);
-				console.log(jqXHR.status);
-				console.log(jqXHR.statusText);
-				console.log(jqXHR.responseXML);
-				console.log(jqXHR.responseText);
-				console.log("Sorry, I can't get the feed");  
-			},
-			complete:function() {console.log("Completed"); }
-		});
-	})(jQuery);	
-	console.log("<<<<<<<<<<<<<<");
-	*/
-	/*
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', url, true); //Open the XHR request. Will be sent later
-	xhr.onreadystatechange = function (event) {
-		pm.request.response.load(event.target);
-	};
-	*/
-//	alert('post');
-
-/*
-	console.log(">>>>>>>>>>>>>>>");
-	makeCorsRequest();
-	console.log("<<<<<<<<<<<<<<");
-*/
 }
 
+function getFeedConfigTypeList($routeParams, $scope, data)
+{
+	$scope.$apply(function(){
+		
+		$scope.feedconfigtypes = data.document['CONFIGS'];
+		feedConfigTypesArray = jQuery.map( $scope.feedconfigtypes, function( a ) {
+			return a;
+		});
+		$scope.feedconfigtypes = feedConfigTypesArray;
+		$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
+		
+	});	
+	// console.log(data);
+}
+
+function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) 
+{
+}
 
 // Create the XHR object.
 function createCORSRequest(method, url) {

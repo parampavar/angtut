@@ -1,0 +1,84 @@
+{
+  "keylayout": "tenantid|FEEDCONFIG",
+  "tenantid": 0,
+  "CONFIGS": {
+    "CUSTOMER": {
+      "updatedby": "Param",
+      "description": "Customer Feed file",
+      "type": "CUSTOMER",
+      "createdby": "Param",
+      "name": "CUSTOMER",
+      "rowkeyschema": [
+        "TerritoryNumber",
+        "AccountNumber",
+        "CustomerType",
+        "ShipToNumber",
+        "PrimaryLocationFlag"
+      ],
+      "rowschema": [
+        "ROWTAG",
+        "AccountNumber",
+        "CustomerType",
+        "Name",
+        "FirstName",
+        "MiddleName",
+        "LastName",
+        "TerritoryNumber",
+        "BillToNumber",
+        "BillToStreet1",
+        "BillToStreet2",
+        "BillToCity",
+        "BillToState",
+        "BillToZip",
+        "BillToCountry",
+        "ShipToNumber",
+        "ShipToName",
+        "PrimaryLocationFlag",
+        "ShipToStreet1",
+        "ShipToStreet2",
+        "ShipToCity",
+        "ShipToState",
+        "ShipToZip",
+        "ShipToCountry",
+        "MailToStreet1",
+        "MailToStreet2",
+        "MailToCity",
+        "MailToState",
+        "MailToZip",
+        "MailToCountry",
+        "Phone",
+        "Fax",
+        "Email",
+        "Operation"
+      ]
+    },
+    "SURGEON": {
+      "name": "SURGEON",
+      "createdby": "Param",
+      "type": "SURGEON",
+      "updatedby": "Param",
+      "description": "Surgeon Master File",
+      "rowkeyschema": [
+        "SurgeonID",
+        "FirstName",
+        "LastName",
+        "City",
+        "State"
+      ],
+      "rowschema": [
+        "SurgeonID",
+        "MENumber",
+        "DEANumber",
+        "IMSNumber",
+        "Speciality",
+        "FirstName",
+        "MiddleName",
+        "LastName",
+        "City",
+        "State",
+        "Zip",
+        "Country"
+      ]
+    }
+  }
+}
