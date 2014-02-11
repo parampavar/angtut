@@ -56,6 +56,11 @@ function MainCntl($route, $routeParams, $location) {
 }
 
 function FeedConfigTypeLayoutController($routeParams, $scope) {
+	$scope.feedconfigtypelayout = {};
+	$scope.feedConfigTypeLayoutAvailableGridOptions = {};
+	$scope.feedConfigTypeLayoutSelectedGridOptions = {};
+	
+	
 }
 
 function FeedConfigTypeListController($routeParams, $scope) {
