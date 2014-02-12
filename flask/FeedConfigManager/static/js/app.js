@@ -34,11 +34,7 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 	});
 	$routeProvider.when('/feedconfigtype/layout/:type_name', {
 		templateUrl: 'static/partials/show_feedconfigtype_layout.html',
-		controller: FeedConfigTypeLayoutController
-	});
-	$routeProvider.when('/feedconfigtype/:postId', {
-		templateUrl: '/static/partials/post-detail.html',
-		controller: PostDetailController
+		controller: FeedConfigTypeLayoutController,
 	});
 	/* Create a "/blog" route that takes the user to the same place as "/feedconfigtype" */
 	$routeProvider.when('/blog', {
@@ -60,7 +56,7 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	// $scope.feedConfigTypeLayoutAvailableGridOptions = {};
 	// $scope.feedConfigTypeLayoutSelectedGridOptions = {};
 	
-	console.log("routeParams=" + $routeParams);
+	console.log("routeParams=" + $routeParams.type_name);
 	
 	// getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }

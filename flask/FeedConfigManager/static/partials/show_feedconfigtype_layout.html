@@ -3,34 +3,3 @@
  <div class="feedConfigTypeLayoutSelectedGridStyle" ng-grid="feedConfigTypeGridOptions">
 </div>
 
-{% extends "layout.html" %}
-{% block body %}
-	<form action="{{ url_for('add_feedconfigtype') }}" method=post class=add-feedconfigtype>
-	  <dl>
-		<dt>updatedby:
-		<dd><input type=text size=30 name=updatedby>
-		
-		<dd><input type=submit value=Adda>
-	  </dl>
-	</form>
-
-	<table class=table>
-	<tr><td>Type</td></tr>
-	<tr><td>{{type}}</td></tr>
-	</table>
-
-	<table class=table>
-		<tr><td>ColumnName</td></tr>
-		{% for columnname in rowschematemplate %}
-		<tr><td>{{columnname}}</td></tr>
-		{% endfor %}
-	</table>
-  
-	<table class=table>
-		<tr><td>ColumnName</td></tr>
-		{% for columnname in currentrowschema %}
-		<tr><td>{{columnname}}</td></tr>
-		{% endfor %}
-	</table>
-	
-{% endblock %}

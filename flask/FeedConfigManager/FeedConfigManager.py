@@ -96,7 +96,8 @@ def basic_pages(**kwargs):
 
 @app.route('/feedconfigtype')
 @app.route('/feedconfigtype/layout/<type_name>')
-def show_feedconfigtypes():
+def show_feedconfigtypes(type_name=None):
+	print ("I am here")
 	return make_response(open('templates/index.html').read())
 
 	
@@ -137,7 +138,9 @@ def add_feedconfigtype():
 	return redirect(url_for('show_feedconfigtypes'))
 
 
-
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 	
 if __name__ == '__main__':
