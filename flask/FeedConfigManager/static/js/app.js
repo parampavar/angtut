@@ -1,26 +1,6 @@
-/*
-angular.module('FeedConfigManager', ['ui.bootstrap']);
-function AlertDemoCtrl($scope) {
-  $scope.alerts = [
-    { type: 'danger', msg: 'Oh snap! Change a few things up and try submitting again.' },
-    { type: 'success', msg: 'Well done! You successfully read this important alert message.' }
-  ];
-
-  $scope.addAlert = function() {
-    $scope.alerts.push({msg: "Another alert!"});
-  };
-
-  $scope.closeAlert = function(index) {
-    $scope.alerts.splice(index, 1);
-  };
-
-}
-*/
 angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'], 
 	function($routeProvider, $locationProvider) {
 	$routeProvider.when('/', {
-//		templateUrl: 'static/partials/show_feedconfigtypes.html',
-//		controller: FeedConfigTypeListController
 		templateUrl: 'static/partials/landing.html',
 		controller: IndexController
 	});
@@ -32,9 +12,11 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 		templateUrl: 'static/partials/show_feedconfigtypes.html',
 		controller: FeedConfigTypeListController
 	});
-	$routeProvider.when('/feedconfigtype/layout/:type_name', {
+	$routeProvider.when('/feedconfigtype/:type_name', {
+		// templateUrl: 'static/partials/show_feedconfigtypes.html',
+		// controller: FeedConfigTypeListController
 		templateUrl: 'static/partials/show_feedconfigtype_layout.html',
-		controller: FeedConfigTypeLayoutController,
+		controller: FeedConfigTypeLayoutController
 	});
 	/* Create a "/blog" route that takes the user to the same place as "/feedconfigtype" */
 	$routeProvider.when('/blog', {
@@ -55,13 +37,13 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	// $scope.feedconfigtypelayout = {};
 	// $scope.feedConfigTypeLayoutAvailableGridOptions = {};
 	// $scope.feedConfigTypeLayoutSelectedGridOptions = {};
-	
-	console.log("routeParams=" + $routeParams.type_name);
+	console.log("routeParams= FeedConfigTypeLayoutController");
 	
 	// getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }
 
 function FeedConfigTypeListController($routeParams, $scope) {
+	console.log("routeParams= FeedConfigTypeListController");
 	$scope.feedconfigtypes = {};
 	$scope.feedConfigTypeGridOptions = {};
 	$.ajaxSetup({ cache: false });
@@ -80,7 +62,7 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			{field:'name', displayName:'Name'}, 
 			{field:'description', displayName:'Description'}, 
 			{field:'createdby', displayName:'Created By'},
-			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a ng-href="/#/feedconfigtype/layout/{{row.entity.type}}">Edit</a></div>'}
+			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a ng-href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'}
 			]
 		};
  

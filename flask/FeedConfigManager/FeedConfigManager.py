@@ -43,50 +43,10 @@ def get_db():
         g.couch_db = connect_db()
     return g.couch_db	
 	
-
 @app.before_request
 def before_request():
 	g.db = connect_db()
 
-	
-#@app.route('/feedconfigtype/layout/<type_name>')
-#def show_feedconfigtype_layout(type_name):
-#	linekey = '1|FEEDCONFIG'
-#	linekeylayout = 'tenantid|FEEDCONFIG'
-#	dictline = {}
-#	currentfeedConfig = {}
-#						
-#	currentrowschema = {}
-#	linekeyfound = False
-#	configtype = {}
-#	try:
-#	dictline = g.db.get(linekey).value
-#	configtype = dictline['CONFIGS'][type_name]
-#	if 'rowschema' in configtype:
-#		currentrowschema = configtype['rowschema']
-#	linekeyfound = True
-		#pass
-#	except CouchbaseError as e:
-#		print ( "show_feedconfigtype_layout: Exception: " + str(e.key))
-		
-#	return render_template('show_feedconfigtype_layout.html', type=type_name, currentrowschema=currentrowschema, rowschematemplate=SurgeonFileRowSchema)	
-	
-#@app.route('/feedconfigtype')
-#def show_feedconfigtypes():
-#	key = '1|FEEDCONFIG'
-#	configs = {}
-#	try:
-#		configtypes = g.db.get(key).value
-#		if 'CONFIGS' in configtypes:
-#			configs = configtypes['CONFIGS']
-#			#print(configs['SURGEON'])
-#			for feedconfigtype in configs:
-#				print(url_for('show_feedconfigtype_layout', type_name=configs[feedconfigtype]['type']))
-#	except CouchbaseError as e:
-#		print ( "deleteLine: Exception: " + str(e.key))	
-#	
-#	return render_template('show_feedconfigtypes.html', feedconfigtypes=configs)	
-	
 # routing for basic pages (pass routing onto the Angular app)
 @app.route('/')
 @app.route('/about')
@@ -95,12 +55,11 @@ def basic_pages(**kwargs):
 	return make_response(open('templates/index.html').read())
 
 @app.route('/feedconfigtype')
-@app.route('/feedconfigtype/layout/<type_name>')
+@app.route('/feedconfigtype/<type_name>')
 def show_feedconfigtypes(type_name=None):
 	print ("I am here")
 	return make_response(open('templates/index.html').read())
 
-	
 @app.route('/feedconfigtype/add', methods=['POST'])
 def add_feedconfigtype():
 	linekey = '1|FEEDCONFIG'
