@@ -1,5 +1,6 @@
 angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'], 
 	function($routeProvider, $locationProvider) {
+		console.log("AAAAAAAAAAAAAAAAAAAA");
 	$routeProvider.when('/', {
 		templateUrl: 'static/partials/landing.html',
 		controller: IndexController
@@ -30,8 +31,15 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 		controller: FeedConfigTypeListController
 	});
 
-	//$locationProvider.html5Mode(true);
+	$locationProvider.html5Mode(true);
+	console.log("BBBBBBBBBBBBBBBBBB");
 });
+
+function AboutController($scope, $routeParams) {
+	console.log("inside AboutController");
+	$scope.aboutname = $routeParams.name;
+}
+
 
 function MainCntl($route, $routeParams, $location) {
   this.$route = $route;
@@ -69,7 +77,7 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			{field:'description', displayName:'Description'}, 
 			{field:'createdby', displayName:'Created By'},
 			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'},
-			{field:'aboutlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/about">About</a></div>'}
+			{field:'aboutlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/about/super">About</a></div>'}
 			]
 		};
  

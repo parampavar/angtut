@@ -5,11 +5,6 @@
 function IndexController($scope) {
 }
 
-function AboutController($scope, $routeParams) {
-	$scope.aboutname = $routeParams.name;
-}
-
-
 
 function PostDetailController($scope, $routeParams, Post) {
 	alert("Inside Post Detail Controller");
