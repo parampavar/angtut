@@ -7,16 +7,22 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 	$routeProvider.when('/about', {
 		templateUrl: 'static/partials/about.html',
 		controller: AboutController
+		// templateUrl: 'static/partials/show_feedconfigtype_layout.html',
+		// controller: 'FeedConfigTypeLayoutController'
+	});
+	$routeProvider.when('/about/:name', {
+		templateUrl: 'static/partials/about.html',
+		controller: AboutController
+		// templateUrl: 'static/partials/show_feedconfigtype_layout.html',
+		// controller: 'FeedConfigTypeLayoutController'
 	});
 	$routeProvider.when('/feedconfigtype', {
 		templateUrl: 'static/partials/show_feedconfigtypes.html',
-		controller: FeedConfigTypeListController
+		controller: 'FeedConfigTypeListController'
 	});
 	$routeProvider.when('/feedconfigtype/:type_name', {
-		// templateUrl: 'static/partials/show_feedconfigtypes.html',
-		// controller: FeedConfigTypeListController
 		templateUrl: 'static/partials/show_feedconfigtype_layout.html',
-		controller: FeedConfigTypeLayoutController
+		controller: 'FeedConfigTypeLayoutController'
 	});
 	/* Create a "/blog" route that takes the user to the same place as "/feedconfigtype" */
 	$routeProvider.when('/blog', {
@@ -24,7 +30,7 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 		controller: FeedConfigTypeListController
 	});
 
-	$locationProvider.html5Mode(true);
+	//$locationProvider.html5Mode(true);
 });
 
 function MainCntl($route, $routeParams, $location) {
@@ -62,7 +68,8 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			{field:'name', displayName:'Name'}, 
 			{field:'description', displayName:'Description'}, 
 			{field:'createdby', displayName:'Created By'},
-			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a ng-href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'}
+			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'},
+			{field:'aboutlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/about">About</a></div>'}
 			]
 		};
  

@@ -5,7 +5,8 @@
 function IndexController($scope) {
 }
 
-function AboutController($scope) {
+function AboutController($scope, $routeParams) {
+	$scope.aboutname = $routeParams.name;
 }
 
 

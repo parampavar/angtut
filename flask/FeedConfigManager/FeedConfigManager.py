@@ -51,6 +51,7 @@ def before_request():
 @app.route('/')
 @app.route('/about')
 @app.route('/blog')
+@app.route('/about/<name>')
 def basic_pages(**kwargs):
 	return make_response(open('templates/index.html').read())
 
