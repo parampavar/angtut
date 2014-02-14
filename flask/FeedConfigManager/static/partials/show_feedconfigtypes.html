@@ -1,33 +1,53 @@
 <div ng-switch on="showDetail">
 	<!-- List Content. -->
-	showDetail = {{showDetail}}
 	<div ng-switch-when="false">
 		<div class="feedConfigTypeGridStyle" ng-grid="feedConfigTypeGridOptions">
 		</div>
 	</div>
 	<div ng-switch-when="true">
-		Selected<br/>	
-          <div class="row-fluid">
+		{{detailType}}
+	  <div id="availableList">
+		<h2>Available List</h2>
             <ul class="thumbnails">
-              <li class="span3" style='margin-left:10px;'>
-                <div class="thumbnail" data-drop="true" ng-model='detailSelectedRowSchema' data-jqyoui-options="{accept:'.btn-draggable:true'}" jqyoui-droppable="{multiple:true}">
+              <li class="span3" >
+                <div class="thumbnail" data-drop="true" ng-model='detailAvailableRowSchemaArray' data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=detailAvailableRowSchemaArray])'}"  jqyoui-droppable="{multiple:true}">
                   <div class="caption">
-                    <div class="btn btn-info btn-draggable" ng-repeat="item in detailSelectedRowSchema" ng-show="item" data-drag="{{true}}" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailSelectedRowSchema" jqyoui-draggable="{index: {{$index}},animate:true}">{{item}}</div>
+                    <div class="btn btn-info btn-draggable" ng-repeat="item in detailAvailableRowSchemaArray" ng-show="item.title" data-drag="{{item.drag}}" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailAvailableRowSchemaArray" jqyoui-draggable="{index: {{$index}},animate:true}">{{item.title}}</div>
                   </div>
                 </div>
               </li>
             </ul>
-          </div>
-		Available<br/>	
-      <div class="navbar-inner">
-        <div class="container form-inline" style="text-align: center;">
-          <div class="btn btn-droppable" ng-repeat="item in detailAvailableRowSchema" data-drop="true" ng-model='detailAvailableRowSchema' data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=detailAvailableRowSchema])'}"  jqyoui-droppable="{index: {{$index}}}">
-            <div class="btn btn-info btn-draggable" data-drag="{{true}}" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailAvailableRowSchema" jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true}" ng-hide="!item.title">{{item}}</div>
-          </div>
-        </div>
-      </div>
-		Available2<br/>	
-		
+	  </div>
+	  
+	  <div id="selectedList">
+		<h2>Selected List</h2>
+            <ul class="thumbnails">
+              <li>
+                <div class="thumbnail" data-drop="true" ng-model='detailSelectedRowSchemaArray' data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=detailSelectedRowSchemaArray])'}"  jqyoui-droppable="{multiple:true}">
+                  <div class="caption">
+                    <div class="btn btn-info btn-draggable" ng-repeat="item in detailSelectedRowSchemaArray" ng-show="item.title" data-drag="{{item.drag}}" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailSelectedRowSchemaArray" jqyoui-draggable="{index: {{$index}},animate:true}">
+					{{item.title}}
+					</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+	  </div>
+	  
+	  <div id="requiredList">
+		<h2>Required List</h2>
+            <ul class="thumbnails">
+              <li>
+                <div class="thumbnail" data-drop="true" ng-model='detailAvailableRowKeySchemaArray' data-jqyoui-options="{accept:'.btn-draggable:not(false)'}"  jqyoui-droppable="{multiple:false}">
+                  <div class="caption">
+                    <div class="btn btn-info btn-draggable" ng-repeat="item in detailAvailableRowKeySchemaArray" ng-show="item.title" data-drag="false" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailAvailableRowKeySchemaArray" jqyoui-draggable="{index: {{$index}},animate:true}">
+					{{item.title}}
+					</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+	  </div>
 	</div>
 </div>
 		

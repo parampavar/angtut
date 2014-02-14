@@ -45,12 +45,17 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	// $scope.feedconfigtypelayout = {};
 	// $scope.feedConfigTypeLayoutAvailableGridOptions = {};
 	// $scope.feedConfigTypeLayoutSelectedGridOptions = {};
-	console.log("routeParams= FeedConfigTypeLayoutController");
 	$scope.showDetail = true;
 	$scope.detailType = $routeParams.type_name;
+	
 	$scope.detailAvailableRowSchema = {};
+	$scope.detailAvailableRowSchemaArray = [];
+
+	$scope.detailAvailableRowKeySchema = {};
+	$scope.detailAvailableRowKeySchemaArray = [];
+
 	$scope.detailSelectedRowSchema = {};
-	$scope.detailAvailableRowSchemaKey = {};
+	$scope.detailSelectedRowSchemaArray = [];
 	// Limit items to be dropped in list1
 	$scope.optionsList1 = {
 	accept: function(dragEl) {
@@ -138,16 +143,27 @@ function getFeedConfigTypeList($routeParams, $scope, data){
 
 function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 	$scope.$apply(function(){
-		
-		var feedconfigtypes = data.document['CONFIGS'][$scope.detailType];
-		// feedConfigTypesArray = jQuery.map( feedconfigtypes, function( a ) {
-			// return a;
-		// });
-		// var feedconfigtypes = feedConfigTypesArray;
+		console.log(data.document['CONFIGS'][$scope.detailType]);
+		$scope.detailAvailableRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
+		$scope.detailAvailableRowSchemaArray = jQuery.map( $scope.detailAvailableRowSchema, function( a ) {
+			var aj = {};
+			aj = { 'title': a, 'drag': true}
+			return aj;
+		});
+		$scope.detailAvailableRowKeySchema = data.document['CONFIGS'][$scope.detailType]['rowkeyschema'];
+		$scope.detailAvailableRowKeySchemaArray = jQuery.map( $scope.detailAvailableRowKeySchema, function( a ) {
+			var aj = {};
+			aj = { 'title': a, 'drag': true}
+			return aj;
+		});
+		//var feedconfigtypes = feedConfigTypesArray;
 		//$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
-		$scope.detailAvailableRowSchema = feedconfigtypes['rowschema'];
-		$scope.detailAvailableRowSchemaKey = feedconfigtypes['rowschemakey'];
-		console.log(feedconfigtypes['rowschema']);
+		// $scope.detailAvailableRowSchema = _detailAvailableRowSchema;
+		// $scope.detailAvailableRowKeySchema = _detailAvailableRowKeySchema;
+		
+		console.log($scope.detailAvailableRowKeySchema);
+		console.log($scope.detailAvailableRowKeySchemaArray);
+		
 	});	
 }
   
