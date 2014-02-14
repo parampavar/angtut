@@ -1,2 +1,33 @@
- <div class="feedConfigTypeGridStyle" ng-grid="feedConfigTypeGridOptions">
+<div ng-switch on="showDetail">
+	<!-- List Content. -->
+	showDetail = {{showDetail}}
+	<div ng-switch-when="false">
+		<div class="feedConfigTypeGridStyle" ng-grid="feedConfigTypeGridOptions">
+		</div>
+	</div>
+	<div ng-switch-when="true">
+		Selected<br/>	
+          <div class="row-fluid">
+            <ul class="thumbnails">
+              <li class="span3" style='margin-left:10px;'>
+                <div class="thumbnail" data-drop="true" ng-model='detailSelectedRowSchema' data-jqyoui-options="{accept:'.btn-draggable:true'}" jqyoui-droppable="{multiple:true}">
+                  <div class="caption">
+                    <div class="btn btn-info btn-draggable" ng-repeat="item in detailSelectedRowSchema" ng-show="item" data-drag="{{true}}" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailSelectedRowSchema" jqyoui-draggable="{index: {{$index}},animate:true}">{{item}}</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+		Available<br/>	
+      <div class="navbar-inner">
+        <div class="container form-inline" style="text-align: center;">
+          <div class="btn btn-droppable" ng-repeat="item in detailAvailableRowSchema" data-drop="true" ng-model='detailAvailableRowSchema' data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=detailAvailableRowSchema])'}"  jqyoui-droppable="{index: {{$index}}}">
+            <div class="btn btn-info btn-draggable" data-drag="{{true}}" data-jqyoui-options="{revert: 'invalid'}" ng-model="detailAvailableRowSchema" jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true}" ng-hide="!item.title">{{item}}</div>
+          </div>
+        </div>
+      </div>
+		Available2<br/>	
+		
+	</div>
 </div>
+		

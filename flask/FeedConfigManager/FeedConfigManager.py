@@ -52,14 +52,16 @@ def before_request():
 @app.route('/about')
 @app.route('/blog')
 @app.route('/about/<name>')
+@app.route('/feedconfigtype')
+@app.route('/feedconfigtype/<type_name>')
 def basic_pages(**kwargs):
 	return make_response(open('templates/index.html').read())
 
-@app.route('/feedconfigtype')
-@app.route('/feedconfigtype/<type_name>')
-def show_feedconfigtypes(type_name=None):
-	print ("I am here")
-	return make_response(open('templates/index.html').read())
+# @app.route('/feedconfigtype')
+# @app.route('/feedconfigtype/<type_name>')
+# def show_feedconfigtypes(type_name=None):
+# 	print ("I am here")
+# 	return make_response(open('templates/index.html').read())
 
 @app.route('/feedconfigtype/add', methods=['POST'])
 def add_feedconfigtype():
