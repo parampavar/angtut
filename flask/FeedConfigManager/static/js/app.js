@@ -30,7 +30,6 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 });
 
 function AboutController($scope, $routeParams) {
-	console.log("inside AboutController");
 	$scope.aboutname = $routeParams.name;
 }
 
@@ -56,6 +55,8 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 
 	$scope.detailSelectedRowSchema = {};
 	$scope.detailSelectedRowSchemaArray = [];
+	
+	$scope.enableSubmit = false;
 	// Limit items to be dropped in list1
 	$scope.optionsList1 = {
 	accept: function(dragEl) {
@@ -66,6 +67,19 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	  }
 	}
 	};
+	
+	$scope.$watch(
+		function() {
+			return $scope.detailSelectedRowSchemaArray;
+		},
+		function(newVal, oldVal) {
+			$scope.enableSubmit = anyMatchInArray($scope.detailAvailableRowKeySchemaArray, newVal, "title");
+		},
+		true
+	);
+	$scope.submit = function() {
+		console.log($scope.detailSelectedRowSchemaArray);
+	};	
 	getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }
 
@@ -166,7 +180,28 @@ function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 		
 	});	
 }
-  
+
+var anyMatchInArray = (function () {
+    "use strict";
+    
+    var func;
+    
+    func = function (targetArray, checkerArray, attributeName) {
+        var found = false;
+		var targetAttributeArray = jQuery.map( targetArray, function( a ) {
+			return a[attributeName];
+		});
+        for (var i = 0, j = checkerArray.length; !found && i < j; i++) {
+            if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
+                found = true;
+            }
+        }
+        return found;
+    };
+    
+    return func;
+}());
+ 
 // Create the XHR object.
 function createCORSRequest(method, url) {
   var xhr = new XMLHttpRequest();

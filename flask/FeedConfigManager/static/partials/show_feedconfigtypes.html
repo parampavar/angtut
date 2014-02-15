@@ -5,6 +5,7 @@
 		</div>
 	</div>
 	<div ng-switch-when="true">
+	<form ng-submit="submit()" ng-controller="FeedConfigTypeLayoutController">
 		{{detailType}}
 	  <div id="availableList">
 		<h2>Available List</h2>
@@ -48,6 +49,8 @@
               </li>
             </ul>
 	  </div>
+		<input class="btn" type="submit" id="submit" value="Submit" ng-disabled="!enableSubmit" required />
+	</form>
 	</div>
 </div>
 		
