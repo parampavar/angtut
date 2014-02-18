@@ -44,8 +44,11 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	// $scope.feedconfigtypelayout = {};
 	// $scope.feedConfigTypeLayoutAvailableGridOptions = {};
 	// $scope.feedConfigTypeLayoutSelectedGridOptions = {};
+	$scope.submitStatus = false;
+	$scope.submitMessage = "Changes successfully saved";
 	$scope.showDetail = true;
 	$scope.detailType = $routeParams.type_name;
+	$scope.currentDocument = {};
 	
 	$scope.detailAvailableRowSchema = {};
 	$scope.detailAvailableRowSchemaArray = [];
@@ -77,15 +80,63 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 		},
 		true
 	);
+	$scope.$watch(
+		function() {
+			return $scope.submitStatus;
+		},
+		function(newVal, oldVal) {
+			$scope.submitStatus = newVal;
+		},
+		true
+	);
 	$scope.submit = function() {
-		console.log($scope.detailSelectedRowSchemaArray);
+		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowschema'] = $scope.detailSelectedRowSchemaArray;
+		console.log($scope.currentDocument);
+		putDataInCouchbase("1|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
 	};	
 	getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }
 
+function putDataInCouchbase(key, putdata, $routeParams, $scope, callback){
+	console.log(putdata);
+	try
+	{
+	// $.ajax({
+		// type: 'PUT',
+		// url: 'http://localhost:3000/default/s/' + key,
+		// data: JSON.stringify({ page : putdata }),
+		// contentType: 'application/json',
+		// dataType: 'json',
+		// success: function(msg) {
+			// alert( "Data Saved: " + msg );
+		// }
+	// })	
+	$.ajax({
+		type: 'PUT',
+		url: 'http://localhost:3000/default/s/' + key,
+		data: putdata
+	})
+	.done(function(jd) {
+		callback($routeParams, $scope, jd);
+	})
+	.fail(function() {
+		console.log("error");
+	})
+	.always(function() {
+		console.log("complete");
+	});
+	}
+	catch(ex)
+	{
+		console.log(ex)
+	}
+}
+
+
 function FeedConfigTypeListController($routeParams, $scope) {
 	
 	$scope.showDetail = false;
+	$scope.currentDocument = {};
 	$scope.feedconfigtypes = {};
 	$scope.feedConfigTypeGridOptions = {};
 	$.ajaxSetup({ cache: false });
@@ -143,7 +194,7 @@ function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
 
 function getFeedConfigTypeList($routeParams, $scope, data){
 	$scope.$apply(function(){
-		
+		$scope.currentDocument = data.document;
 		$scope.feedconfigtypes = data.document['CONFIGS'];
 		feedConfigTypesArray = jQuery.map( $scope.feedconfigtypes, function( a ) {
 			return a;
@@ -157,7 +208,7 @@ function getFeedConfigTypeList($routeParams, $scope, data){
 
 function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 	$scope.$apply(function(){
-		console.log(data.document['CONFIGS'][$scope.detailType]);
+		$scope.currentDocument = data.document;
 		$scope.detailAvailableRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
 		$scope.detailAvailableRowSchemaArray = jQuery.map( $scope.detailAvailableRowSchema, function( a ) {
 			var aj = {};
@@ -175,32 +226,35 @@ function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 		// $scope.detailAvailableRowSchema = _detailAvailableRowSchema;
 		// $scope.detailAvailableRowKeySchema = _detailAvailableRowKeySchema;
 		
-		console.log($scope.detailAvailableRowKeySchema);
-		console.log($scope.detailAvailableRowKeySchemaArray);
+		// console.log($scope.detailAvailableRowKeySchema);
+		// console.log($scope.detailAvailableRowKeySchemaArray);
 		
 	});	
 }
 
-var anyMatchInArray = (function () {
-    "use strict";
-    
-    var func;
-    
-    func = function (targetArray, checkerArray, attributeName) {
-        var found = false;
-		var targetAttributeArray = jQuery.map( targetArray, function( a ) {
-			return a[attributeName];
-		});
-        for (var i = 0, j = checkerArray.length; !found && i < j; i++) {
-            if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
-                found = true;
-            }
-        }
-        return found;
-    };
-    
-    return func;
-}());
+function saveFeedConfigTypeLayout($routeParams, $scope, data) {
+	$scope.$apply(function(){
+		data.document;
+		$scope.submitStatus = true;
+	});	
+}
+
+function anyMatchInArray (targetArray, checkerArray, attributeName) {
+	var found = false;
+	var foundCount = 0;
+	var targetAttributeArray = jQuery.map( targetArray, function( a ) {
+		return a[attributeName];
+	});
+	for (var i = 0, j = checkerArray.length; foundCount < targetArray.length && i < j; i++) {
+		if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
+			foundCount++; 
+		}
+	}
+	if (foundCount < targetArray.length)
+		return false;
+	else
+		return true;
+};
  
 // Create the XHR object.
 function createCORSRequest(method, url) {
@@ -218,7 +272,6 @@ function createCORSRequest(method, url) {
   }
   return xhr;
 }
-
 
 // Make the actual CORS request.
 function makeCorsRequest() {
