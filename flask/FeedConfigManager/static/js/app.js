@@ -33,11 +33,40 @@ function AboutController($scope, $routeParams) {
 	$scope.aboutname = $routeParams.name;
 }
 
-
 function MainCntl($route, $routeParams, $location) {
   this.$route = $route;
   this.$location = $location;
   this.$routeParams = $routeParams;
+}
+
+function FeedConfigTypeListController($routeParams, $scope) {
+	
+	$scope.showDetail = false;
+	$scope.currentDocument = {};
+	$scope.feedconfigtypes = {};
+	$scope.feedConfigTypeGridOptions = {};
+	$.ajaxSetup({ cache: false });
+	
+	var jfct = { "updatedby":"", "description":"", "type":"", "createdby":"", "name":"" };
+	feedConfigTypesArray = jQuery.map( jfct, function( a ) {
+		return a;
+	});
+	$scope.feedconfigtypes = jfct;
+
+	$scope.feedConfigTypeGridOptions = { 
+		data: 'feedconfigtypes',
+		multiSelect: false,
+        columnDefs: [
+			{field:'type', displayName:'Type'}, 
+			{field:'name', displayName:'Name'}, 
+			{field:'description', displayName:'Description'}, 
+			{field:'createdby', displayName:'Created By'},
+			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'},
+			{field:'aboutlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/about/super">About</a></div>'}
+			]
+		};
+ 
+	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeList);
 }
 
 function FeedConfigTypeLayoutController($routeParams, $scope) {
@@ -76,7 +105,7 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 			return $scope.detailSelectedRowSchemaArray;
 		},
 		function(newVal, oldVal) {
-			$scope.enableSubmit = anyMatchInArray($scope.detailAvailableRowKeySchemaArray, newVal, "title");
+			$scope.enableSubmit = anyMatchInArray($scope.detailSelectedRowSchema, $scope.detailAvailableRowKeySchemaArray, newVal, "title");
 		},
 		true
 	);
@@ -90,32 +119,60 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 		true
 	);
 	$scope.submit = function() {
-		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowschema'] = $scope.detailSelectedRowSchemaArray;
+		$scope.currentDocument['tenantid'] = 1;
+		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowschema'] = $scope.detailSelectedRowSchema;
 		console.log($scope.currentDocument);
 		putDataInCouchbase("1|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
 	};	
 	getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }
 
+function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
+	$scope.$apply(function(){
+		$scope.currentDocument = data.document;
+		$scope.detailAvailableRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
+		$scope.detailAvailableRowSchemaArray = jQuery.map( $scope.detailAvailableRowSchema, function( a ) {
+			var aj = {};
+			aj = { 'title': a, 'drag': true}
+			return aj;
+		});
+		$scope.detailAvailableRowKeySchema = data.document['CONFIGS'][$scope.detailType]['rowkeyschema'];
+		$scope.detailAvailableRowKeySchemaArray = jQuery.map( $scope.detailAvailableRowKeySchema, function( a ) {
+			var aj = {};
+			aj = { 'title': a, 'drag': true}
+			return aj;
+		});
+	});	
+}
+
 function putDataInCouchbase(key, putdata, $routeParams, $scope, callback){
 	console.log(putdata);
 	try
 	{
-	// $.ajax({
-		// type: 'PUT',
-		// url: 'http://localhost:3000/default/s/' + key,
-		// data: JSON.stringify({ page : putdata }),
-		// contentType: 'application/json',
-		// dataType: 'json',
-		// success: function(msg) {
-			// alert( "Data Saved: " + msg );
-		// }
-	// })	
+	var p =  {
+       bucket: "default",
+       key: key,
+       post: {
+         value: putdata,
+         options: {}
+       }
+     }
+	
 	$.ajax({
 		type: 'PUT',
 		url: 'http://localhost:3000/default/s/' + key,
-		data: putdata
-	})
+		data: JSON.stringify(p),
+		contentType: 'application/json',
+		dataType: 'json',
+		success: function(msg) {
+			console.log( msg );
+		}
+	})	
+	// $.ajax({
+		// type: 'PUT',
+		// url: 'http://localhost:3000/default/s/' + key,
+		// data: putdata
+	// })
 	.done(function(jd) {
 		callback($routeParams, $scope, jd);
 	})
@@ -132,49 +189,11 @@ function putDataInCouchbase(key, putdata, $routeParams, $scope, callback){
 	}
 }
 
-
-function FeedConfigTypeListController($routeParams, $scope) {
-	
-	$scope.showDetail = false;
-	$scope.currentDocument = {};
-	$scope.feedconfigtypes = {};
-	$scope.feedConfigTypeGridOptions = {};
-	$.ajaxSetup({ cache: false });
-	
-	var jfct = { "updatedby":"", "description":"", "type":"", "createdby":"", "name":"" };
-	feedConfigTypesArray = jQuery.map( jfct, function( a ) {
-		return a;
-	});
-	$scope.feedconfigtypes = jfct;
-
-	$scope.feedConfigTypeGridOptions = { 
-		data: 'feedconfigtypes',
-		multiSelect: false,
-        columnDefs: [
-			{field:'type', displayName:'Type'}, 
-			{field:'name', displayName:'Name'}, 
-			{field:'description', displayName:'Description'}, 
-			{field:'createdby', displayName:'Created By'},
-			//{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/CUSTOMER">Edit</a></div>'},
-			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'},
-			{field:'aboutlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/about/super">About</a></div>'}
-			]
-		};
- 
-	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeList);
-}
-
-
 function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
 	try
 	{
 	$.getJSON('http://localhost:3000/default/' + key, function(data) {
-	//$.getJSON('http://localhost:3000/default/1|FEEDCONFIG', function(data) {
-	//$.getJSON('http://localhost:3000/default/1|FEEDCONFIG?callback=?', function() {
-		//console.log("success");
-		//console.log(data);
 	})
-	// .done(callback($routeParams, $scope, data))
 	.done(function(jd) {
 		//console.log(jd);
 		callback($routeParams, $scope, jd);
@@ -205,6 +224,8 @@ function getFeedConfigTypeList($routeParams, $scope, data){
 	});	
 	// console.log(data);
 }
+-	
+
 
 function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 	$scope.$apply(function(){
@@ -221,14 +242,6 @@ function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 			aj = { 'title': a, 'drag': true}
 			return aj;
 		});
-		//var feedconfigtypes = feedConfigTypesArray;
-		//$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
-		// $scope.detailAvailableRowSchema = _detailAvailableRowSchema;
-		// $scope.detailAvailableRowKeySchema = _detailAvailableRowKeySchema;
-		
-		// console.log($scope.detailAvailableRowKeySchema);
-		// console.log($scope.detailAvailableRowKeySchemaArray);
-		
 	});	
 }
 
@@ -239,13 +252,16 @@ function saveFeedConfigTypeLayout($routeParams, $scope, data) {
 	});	
 }
 
-function anyMatchInArray (targetArray, checkerArray, attributeName) {
+function anyMatchInArray (targetJsonArray, targetArray, checkerArray, attributeName) {
 	var found = false;
 	var foundCount = 0;
 	var targetAttributeArray = jQuery.map( targetArray, function( a ) {
 		return a[attributeName];
 	});
-	for (var i = 0, j = checkerArray.length; foundCount < targetArray.length && i < j; i++) {
+	targetJsonArray = jQuery.map( checkerArray, function( a ) {
+		return a[attributeName];
+	});
+	for (var i = 0, j = checkerArray.length; foundCount < targetAttributeArray.length && i < j; i++) {
 		if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
 			foundCount++; 
 		}
