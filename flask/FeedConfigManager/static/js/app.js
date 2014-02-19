@@ -20,11 +20,6 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 		templateUrl: 'static/partials/show_feedconfigtypes.html',
 		controller: FeedConfigTypeLayoutController
 	});
-	// /* Create a "/blog" route that takes the user to the same place as "/feedconfigtype" */
-	// $routeProvider.when('/blog', {
-		// templateUrl: 'static/partials/show_feedconfigtypes.html',
-		// controller: FeedConfigTypeListController
-	// });
 
 	$locationProvider.html5Mode(true);
 });
@@ -69,10 +64,20 @@ function FeedConfigTypeListController($routeParams, $scope) {
 	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeList);
 }
 
+function getFeedConfigTypeList($routeParams, $scope, data){
+	$scope.$apply(function(){
+		$scope.currentDocument = data.document;
+		$scope.feedconfigtypes = data.document['CONFIGS'];
+		feedConfigTypesArray = jQuery.map( $scope.feedconfigtypes, function( a ) {
+			return a;
+		});
+		$scope.feedconfigtypes = feedConfigTypesArray;
+		$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
+		
+	});	
+}
+
 function FeedConfigTypeLayoutController($routeParams, $scope) {
-	// $scope.feedconfigtypelayout = {};
-	// $scope.feedConfigTypeLayoutAvailableGridOptions = {};
-	// $scope.feedConfigTypeLayoutSelectedGridOptions = {};
 	$scope.submitStatus = false;
 	$scope.submitMessage = "Changes successfully saved";
 	$scope.showDetail = true;
@@ -121,111 +126,11 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	$scope.submit = function() {
 		$scope.currentDocument['tenantid'] = 1;
 		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowschema'] = $scope.detailSelectedRowSchema;
-		console.log($scope.currentDocument);
+		//console.log($scope.currentDocument);
 		putDataInCouchbase("1|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
 	};	
 	getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
 }
-
-function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
-	$scope.$apply(function(){
-		$scope.currentDocument = data.document;
-		$scope.detailAvailableRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
-		$scope.detailAvailableRowSchemaArray = jQuery.map( $scope.detailAvailableRowSchema, function( a ) {
-			var aj = {};
-			aj = { 'title': a, 'drag': true}
-			return aj;
-		});
-		$scope.detailAvailableRowKeySchema = data.document['CONFIGS'][$scope.detailType]['rowkeyschema'];
-		$scope.detailAvailableRowKeySchemaArray = jQuery.map( $scope.detailAvailableRowKeySchema, function( a ) {
-			var aj = {};
-			aj = { 'title': a, 'drag': true}
-			return aj;
-		});
-	});	
-}
-
-function putDataInCouchbase(key, putdata, $routeParams, $scope, callback){
-	console.log(putdata);
-	try
-	{
-	var p =  {
-       bucket: "default",
-       key: key,
-       post: {
-         value: putdata,
-         options: {}
-       }
-     }
-	
-	$.ajax({
-		type: 'PUT',
-		url: 'http://localhost:3000/default/s/' + key,
-		data: JSON.stringify(p),
-		contentType: 'application/json',
-		dataType: 'json',
-		success: function(msg) {
-			console.log( msg );
-		}
-	})	
-	// $.ajax({
-		// type: 'PUT',
-		// url: 'http://localhost:3000/default/s/' + key,
-		// data: putdata
-	// })
-	.done(function(jd) {
-		callback($routeParams, $scope, jd);
-	})
-	.fail(function() {
-		console.log("error");
-	})
-	.always(function() {
-		console.log("complete");
-	});
-	}
-	catch(ex)
-	{
-		console.log(ex)
-	}
-}
-
-function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
-	try
-	{
-	$.getJSON('http://localhost:3000/default/' + key, function(data) {
-	})
-	.done(function(jd) {
-		//console.log(jd);
-		callback($routeParams, $scope, jd);
-	})
-	.fail(function() {
-		console.log("error");
-	})
-	.always(function() {
-		console.log("complete");
-	});
-	}
-	catch(ex)
-	{
-		console.log(ex)
-	}
-}
-
-function getFeedConfigTypeList($routeParams, $scope, data){
-	$scope.$apply(function(){
-		$scope.currentDocument = data.document;
-		$scope.feedconfigtypes = data.document['CONFIGS'];
-		feedConfigTypesArray = jQuery.map( $scope.feedconfigtypes, function( a ) {
-			return a;
-		});
-		$scope.feedconfigtypes = feedConfigTypesArray;
-		$scope.feedConfigTypeGridOptions = { data: 'feedconfigtypes' };
-		
-	});	
-	// console.log(data);
-}
--	
-
 
 function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 	$scope.$apply(function(){
@@ -272,6 +177,63 @@ function anyMatchInArray (targetJsonArray, targetArray, checkerArray, attributeN
 		return true;
 };
  
+function putDataInCouchbase(key, putdata, $routeParams, $scope, callback){
+	try	{
+		var p =  {
+		   bucket: "default",
+		   key: key,
+		   post: {
+			 value: putdata,
+			 options: {}
+		   }
+		 }
+	
+		$.ajax({
+			type: 'PUT',
+			url: 'http://localhost:3000/default/s/' + key,
+			data: JSON.stringify(p),
+			contentType: 'application/json',
+			dataType: 'json',
+			success: function(msg) {
+				console.log( msg );
+			}
+		})	
+		.done(function(jd) {
+			callback($routeParams, $scope, jd);
+		})
+		.fail(function() {
+			console.log("put error");
+		})
+		.always(function() {
+			console.log("put complete");
+		});
+	}
+	catch(ex) {
+		console.log(ex)
+	}
+}
+
+function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
+	try
+	{
+		$.getJSON('http://localhost:3000/default/' + key, function(data) {
+		})
+		.done(function(jd) {
+			callback($routeParams, $scope, jd);
+		})
+		.fail(function() {
+			console.log("get error");
+		})
+		.always(function() {
+			console.log("get complete");
+		});
+	}
+	catch(ex)
+	{
+		console.log(ex)
+	}
+}
+
 // Create the XHR object.
 function createCORSRequest(method, url) {
   var xhr = new XMLHttpRequest();
