@@ -56,8 +56,7 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			{field:'name', displayName:'Name'}, 
 			{field:'description', displayName:'Description'}, 
 			{field:'createdby', displayName:'Created By'},
-			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'},
-			{field:'aboutlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/about/super">About</a></div>'}
+			{field:'editlayout', displayName: '', cellTemplate: '<div class="ngCellText"><a href="/feedconfigtype/{{row.entity.type}}">Edit</a></div>'}
 			]
 		};
  
@@ -82,6 +81,7 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	$scope.submitMessage = "Changes successfully saved";
 	$scope.showDetail = true;
 	$scope.detailType = $routeParams.type_name;
+	$scope.masterDocument = {};
 	$scope.currentDocument = {};
 	
 	$scope.detailAvailableRowSchema = {};
@@ -103,10 +103,12 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 			return $scope.detailSelectedRowSchemaArray;
 		},
 		function(newVal, oldVal) {
-			$scope.disableSubmit = !anyMatchInArray($scope.detailSelectedRowSchema, $scope.detailAvailableRowKeySchemaArray, newVal, "title");
-			$scope.detailSelectedRowSchema = jQuery.map( newVal, function( a ) {
-				return a["title"];
-			});
+			if (newVal.length > 0){
+				$scope.disableSubmit = !anyMatchInArray($scope.detailSelectedRowSchema, $scope.detailAvailableRowKeySchemaArray, newVal, "title");
+				$scope.detailSelectedRowSchema = jQuery.map( newVal, function( a ) {
+					return a["title"];
+				});
+			}
 		},
 		true
 	);
@@ -120,8 +122,9 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 		true
 	);
 	$scope.submit = function() {
-		$scope.currentDocument['tenantid'] = 1;
+		//$scope.currentDocument['tenantid'] = 1;
 		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowschema'] = $scope.detailSelectedRowSchema;
+		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowkeyschema'] = $scope.detailAvailableRowKeySchema;
 		//console.log($scope.currentDocument);
 		putDataInCouchbase("1|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
 	};	
@@ -131,25 +134,38 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 
 function getFeedConfigTypeLayoutSelected($routeParams, $scope, data) {
 	$scope.$apply(function(){
-		//$scope.currentDocument = data.document;
+		$scope.currentDocument = data.document;
 		$scope.detailSelectedRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
+		if ( $scope.detailSelectedRowSchema ) {
 		$scope.detailSelectedRowSchemaArray = jQuery.map( $scope.detailSelectedRowSchema, function( a ) {
 			var aj = {};
 			aj = { 'title': a, 'drag': true}
 			return aj;
 		});
+		}
+		//$scope.detailSelectedRowSchemaArray = arrayforDragList($scope.detailSelectedRowSchema);
+		
 		$scope.detailSelectedRowKeySchema = data.document['CONFIGS'][$scope.detailType]['rowkeyschema'];
+		if ( $scope.detailSelectedRowKeySchema ) {
 		$scope.detailSelectedRowKeySchemaArray = jQuery.map( $scope.detailSelectedRowKeySchema, function( a ) {
 			var aj = {};
 			aj = { 'title': a, 'drag': true}
 			return aj;
 		});
+		}
+		//$scope.detailSelectedRowKeySchemaArray = arrayforDragList($scope.detailSelectedRowKeySchema);
+		// Remove already selected items from available items
+		for(var i = $scope.detailSelectedRowSchema.length-1; i >= 0; i--){
+			var j = $scope.detailAvailableRowSchema.indexOf($scope.detailSelectedRowSchema[i]);
+			$scope.detailAvailableRowSchemaArray.splice(j,1);
+			$scope.detailAvailableRowSchema.splice(j,1);
+		}
 	});	
 }
 
 function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
 	$scope.$apply(function(){
-		$scope.currentDocument = data.document;
+		$scope.masterDocument = data.document;
 		$scope.detailAvailableRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
 		$scope.detailAvailableRowSchemaArray = jQuery.map( $scope.detailAvailableRowSchema, function( a ) {
 			var aj = {};
@@ -172,15 +188,23 @@ function saveFeedConfigTypeLayout($routeParams, $scope, data) {
 	});	
 }
 
+function arrayforDragList(jsonArray, attribute){
+	if ( jsonArray ) {
+		if (!attribute) attribute = 'title';
+		return jQuery.map( jsonArray, function( a ) {
+			var aj = {};
+			aj = { attribute: a, 'drag': true}
+			return aj;
+		});
+	}
+}
+
 function anyMatchInArray (targetJsonArray, targetArray, checkerArray, attributeName) {
 	var found = false;
 	var foundCount = 0;
 	var targetAttributeArray = jQuery.map( targetArray, function( a ) {
 		return a[attributeName];
 	});
-	// targetJsonArray = jQuery.map( checkerArray, function( a ) {
-		// return a[attributeName];
-	// });
 	for (var i = 0, j = checkerArray.length; foundCount < targetAttributeArray.length && i < j; i++) {
 		if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
 			foundCount++; 
@@ -234,6 +258,7 @@ function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
 		$.getJSON('http://localhost:3000/default/' + key, function(data) {
 		})
 		.done(function(jd) {
+			console.log("get done");
 			callback($routeParams, $scope, jd);
 		})
 		.fail(function() {
