@@ -93,17 +93,10 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	$scope.detailSelectedRowSchema = {};
 	$scope.detailSelectedRowSchemaArray = [];
 	
+	$scope.detailSelectedRowKeySchema = {};
+	$scope.detailSelectedRowKeySchemaArray = [];
+	
 	$scope.disableSubmit = true;
-	// Limit items to be dropped in list1
-	$scope.optionsList1 = {
-	accept: function(dragEl) {
-	  if ($scope.list1.length >= 2) {
-		return false;
-	  } else {
-		return true;
-	  }
-	}
-	};
 	
 	$scope.$watch(
 		function() {
@@ -133,6 +126,25 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 		putDataInCouchbase("1|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
 	};	
 	getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
+	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutSelected);
+}
+
+function getFeedConfigTypeLayoutSelected($routeParams, $scope, data) {
+	$scope.$apply(function(){
+		//$scope.currentDocument = data.document;
+		$scope.detailSelectedRowSchema = data.document['CONFIGS'][$scope.detailType]['rowschema'];
+		$scope.detailSelectedRowSchemaArray = jQuery.map( $scope.detailSelectedRowSchema, function( a ) {
+			var aj = {};
+			aj = { 'title': a, 'drag': true}
+			return aj;
+		});
+		$scope.detailSelectedRowKeySchema = data.document['CONFIGS'][$scope.detailType]['rowkeyschema'];
+		$scope.detailSelectedRowKeySchemaArray = jQuery.map( $scope.detailSelectedRowKeySchema, function( a ) {
+			var aj = {};
+			aj = { 'title': a, 'drag': true}
+			return aj;
+		});
+	});	
 }
 
 function getFeedConfigTypeLayoutAvailable($routeParams, $scope, data) {
