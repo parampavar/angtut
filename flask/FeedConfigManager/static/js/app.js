@@ -93,7 +93,7 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 	$scope.detailSelectedRowSchema = {};
 	$scope.detailSelectedRowSchemaArray = [];
 	
-	$scope.enableSubmit = false;
+	$scope.disableSubmit = true;
 	// Limit items to be dropped in list1
 	$scope.optionsList1 = {
 	accept: function(dragEl) {
@@ -110,7 +110,10 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 			return $scope.detailSelectedRowSchemaArray;
 		},
 		function(newVal, oldVal) {
-			$scope.enableSubmit = anyMatchInArray($scope.detailSelectedRowSchema, $scope.detailAvailableRowKeySchemaArray, newVal, "title");
+			$scope.disableSubmit = !anyMatchInArray($scope.detailSelectedRowSchema, $scope.detailAvailableRowKeySchemaArray, newVal, "title");
+			$scope.detailSelectedRowSchema = jQuery.map( newVal, function( a ) {
+				return a["title"];
+			});
 		},
 		true
 	);
@@ -163,9 +166,9 @@ function anyMatchInArray (targetJsonArray, targetArray, checkerArray, attributeN
 	var targetAttributeArray = jQuery.map( targetArray, function( a ) {
 		return a[attributeName];
 	});
-	targetJsonArray = jQuery.map( checkerArray, function( a ) {
-		return a[attributeName];
-	});
+	// targetJsonArray = jQuery.map( checkerArray, function( a ) {
+		// return a[attributeName];
+	// });
 	for (var i = 0, j = checkerArray.length; foundCount < targetAttributeArray.length && i < j; i++) {
 		if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
 			foundCount++; 
