@@ -54,6 +54,8 @@ def before_request():
 @app.route('/about/<name>')
 @app.route('/feedconfigtype')
 @app.route('/feedconfigtype/<type_name>')
+# @app.route('/<tenantid>/feedconfigtype')
+# @app.route('/<tenantid>/feedconfigtype/<type_name>')
 def basic_pages(**kwargs):
 	return make_response(open('templates/index.html').read())
 

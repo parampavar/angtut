@@ -20,6 +20,14 @@ angular.module('FeedConfigManager', ['ngRoute', 'ngGrid', 'ngDragDrop'],
 		templateUrl: 'static/partials/show_feedconfigtypes.html',
 		controller: FeedConfigTypeLayoutController
 	});
+	// $routeProvider.when('/:tenantid/feedconfigtype', {
+		// templateUrl: 'static/partials/show_feedconfigtypes.html',
+		// controller: FeedConfigTypeListController
+	// });
+	// $routeProvider.when('/:tenantid/feedconfigtype/:type_name', {
+		// templateUrl: 'static/partials/show_feedconfigtypes.html',
+		// controller: FeedConfigTypeLayoutController
+	// });
 
 	$locationProvider.html5Mode(true);
 });
@@ -37,6 +45,7 @@ function MainCntl($route, $routeParams, $location) {
 function FeedConfigTypeListController($routeParams, $scope) {
 	
 	$scope.showDetail = false;
+	$scope.tenantid = 1; //$routeParams.tenantid;
 	$scope.currentDocument = {};
 	$scope.feedconfigtypes = {};
 	$scope.feedConfigTypeGridOptions = {};
@@ -60,7 +69,7 @@ function FeedConfigTypeListController($routeParams, $scope) {
 			]
 		};
  
-	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeList);
+	getDocumentFromCouchbase($scope.tenantid + "|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeList);
 }
 
 function getFeedConfigTypeList($routeParams, $scope, data){
@@ -78,6 +87,7 @@ function getFeedConfigTypeList($routeParams, $scope, data){
 
 function FeedConfigTypeLayoutController($routeParams, $scope) {
 	$scope.submitStatus = false;
+	$scope.tenantid = 1; //$routeParams.tenantid;
 	$scope.submitMessage = "Changes successfully saved";
 	$scope.showDetail = true;
 	$scope.detailType = $routeParams.type_name;
@@ -126,10 +136,10 @@ function FeedConfigTypeLayoutController($routeParams, $scope) {
 		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowschema'] = $scope.detailSelectedRowSchema;
 		$scope.currentDocument['CONFIGS'][$scope.detailType]['rowkeyschema'] = $scope.detailAvailableRowKeySchema;
 		//console.log($scope.currentDocument);
-		putDataInCouchbase("1|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
+		putDataInCouchbase($scope.tenantid + "|FEEDCONFIG", $scope.currentDocument, $routeParams, $scope, saveFeedConfigTypeLayout);
 	};	
 	getDocumentFromCouchbase("0|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutAvailable);
-	getDocumentFromCouchbase("1|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutSelected);
+	getDocumentFromCouchbase($scope.tenantid + "|FEEDCONFIG", $routeParams, $scope, getFeedConfigTypeLayoutSelected);
 }
 
 function getFeedConfigTypeLayoutSelected($routeParams, $scope, data) {
@@ -154,12 +164,14 @@ function getFeedConfigTypeLayoutSelected($routeParams, $scope, data) {
 		});
 		}
 		//$scope.detailSelectedRowKeySchemaArray = arrayforDragList($scope.detailSelectedRowKeySchema);
+
 		// Remove already selected items from available items
 		for(var i = $scope.detailSelectedRowSchema.length-1; i >= 0; i--){
 			var j = $scope.detailAvailableRowSchema.indexOf($scope.detailSelectedRowSchema[i]);
 			$scope.detailAvailableRowSchemaArray.splice(j,1);
 			$scope.detailAvailableRowSchema.splice(j,1);
 		}
+		//removeElementsFromArray($scope.detailSelectedRowSchema, $scope.detailAvailableRowSchemaArray, $scope.detailAvailableRowSchema);
 	});	
 }
 
@@ -186,145 +198,4 @@ function saveFeedConfigTypeLayout($routeParams, $scope, data) {
 		data.document;
 		$scope.submitStatus = true;
 	});	
-}
-
-function arrayforDragList(jsonArray, attribute){
-	if ( jsonArray ) {
-		if (!attribute) attribute = 'title';
-		return jQuery.map( jsonArray, function( a ) {
-			var aj = {};
-			aj = { attribute: a, 'drag': true}
-			return aj;
-		});
-	}
-}
-
-function anyMatchInArray (targetJsonArray, targetArray, checkerArray, attributeName) {
-	var found = false;
-	var foundCount = 0;
-	var targetAttributeArray = jQuery.map( targetArray, function( a ) {
-		return a[attributeName];
-	});
-	for (var i = 0, j = checkerArray.length; foundCount < targetAttributeArray.length && i < j; i++) {
-		if (targetAttributeArray.indexOf(checkerArray[i][attributeName]) > -1) {
-			foundCount++; 
-		}
-	}
-	if (foundCount < targetArray.length)
-		return false;
-	else
-		return true;
-};
- 
-function putDataInCouchbase(key, putdata, $routeParams, $scope, callback){
-	try	{
-		var p =  {
-		   bucket: "default",
-		   key: key,
-		   post: {
-			 value: putdata,
-			 options: {}
-		   }
-		 }
-	
-		$.ajax({
-			type: 'PUT',
-			url: 'http://localhost:3000/default/s/' + key,
-			data: JSON.stringify(p),
-			contentType: 'application/json',
-			dataType: 'json',
-			success: function(msg) {
-				console.log( msg );
-			}
-		})	
-		.done(function(jd) {
-			callback($routeParams, $scope, jd);
-		})
-		.fail(function() {
-			console.log("put error");
-		})
-		.always(function() {
-			console.log("put complete");
-		});
-	}
-	catch(ex) {
-		console.log(ex)
-	}
-}
-
-function getDocumentFromCouchbase(key, $routeParams, $scope, callback){
-	try
-	{
-		$.getJSON('http://localhost:3000/default/' + key, function(data) {
-		})
-		.done(function(jd) {
-			console.log("get done");
-			callback($routeParams, $scope, jd);
-		})
-		.fail(function() {
-			console.log("get error");
-		})
-		.always(function() {
-			console.log("get complete");
-		});
-	}
-	catch(ex)
-	{
-		console.log(ex)
-	}
-}
-
-// Create the XHR object.
-function createCORSRequest(method, url) {
-  var xhr = new XMLHttpRequest();
-  if ("withCredentials" in xhr) {
-    // XHR for Chrome/Firefox/Opera/Safari.
-    xhr.open(method, url, true);
-  } else if (typeof XDomainRequest != "undefined") {
-    // XDomainRequest for IE.
-    xhr = new XDomainRequest();
-    xhr.open(method, url);
-  } else {
-    // CORS not supported.
-    xhr = null;
-  }
-  return xhr;
-}
-
-// Make the actual CORS request.
-function makeCorsRequest() {
-  // All HTML5 Rocks properties support CORS.
-  var url = 'http://updates.html5rocks.com';
-  url = 'http://localhost:3000/default/1|FEEDCONFIG?callback=?';
-
-  var xhr = createCORSRequest('GET', url);
-  if (!xhr) {
-    console.log('CORS not supported');
-    return;
-  }
-
-  // Response handlers.
-  xhr.onreadystatechange  = function(evtXHR) {
-		if (xhr.readyState == 4)
-        {
-			console.log("xhr.status=" + xhr.status);
-                if (xhr.status == 200)
-                {
-                    //var response = xhr.responseXML;
-					console.log("responseXML =" + xhr.responseXML);
-					console.log("responseText =" + xhr.responseText);
-                }
-                else
-                    console.log("xhr Errors Occured");
-        }
-        else
-            console.log("currently the application is at" + xhr.readyState);
-	console.log('Response from CORS request to ' + url + ': ');
-  };
-
-  xhr.onerror = function() {
-    console.log('Woops, there was an error making the request.');
-  };
-
-  xhr.send();
 }
