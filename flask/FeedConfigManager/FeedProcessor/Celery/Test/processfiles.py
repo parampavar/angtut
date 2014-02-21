@@ -49,9 +49,10 @@ def startProcess():
 	# logger.info(startProcess.FeedDefinitions)
 	# logger.info("Listing 1|FEEDCONFIG doc from cb")
 	# logger.info(startProcess.cb.get("1|FEEDCONFIG").value)
-	for k, v in startProcess.cb.get("1|FEEDCONFIG").value.items(): #FeedDefinitions.iteritems():
-		if ( k == 'CONFIGS' ):
-			logger.debug (v['CUSTOMER'])
+	cbDocument = startProcess.cb.get("1|FEEDCONFIG").value
+	if ( cbDocument ):
+		# for k, v in cbDocument["CONFIGS"].items(): #FeedDefinitions.iteritems():
+			# logger.debug (v)
 		# if ( k == 'CUSTOMER' or k == 'SURGEON' ):
 			# rowkeyschema = v['rowkeyschema']
 			# rowschema = v['rowschema']
@@ -60,74 +61,83 @@ def startProcess():
 			# logger.debug ("rowkeyschema-----------------")
 			# logger.debug (rowkeyschema)
 	
-	"""
-	for infile in glob.glob( os.path.join(path, '*.txt') ):
-		logger.info("Processing file : %s" % infile)
-		logger.debug("Acquiring lock for file : %s" % infile)
-		filelock = locking.acquire_lockr(infile, block=1)
-		logger.debug("Acquired lock for file : %s" % infile)
-		locking.release_lock(filelock)
-		logger.debug("Releasing lock for file : %s" % infile)
 		
-		with open(infile, 'r') as content_file:
-			content = content_file.read()
+		for infile in glob.glob( os.path.join(path, '*.txt') ):
+			logger.info("Processing file : %s" % infile)
+			logger.debug("Acquiring lock for file : %s" % infile)
+			filelock = locking.acquire_lockr(infile, block=1)
+			logger.debug("Acquired lock for file : %s" % infile)
+			locking.release_lock(filelock)
+			logger.debug("Releasing lock for file : %s" % infile)
+			
+			with open(infile, 'r') as content_file:
+				content = content_file.read()
 
-		lines = content.splitlines()
-		firstline = lines[0]
-		lastline = lines[len(lines)-1]
-		
-		trlRowCount = int(lastline.split("|")[1])
-		if ( trlRowCount == (len(lines) - 2) ):
-			if (trlRowCount > 0):
-				for k, v in startProcess.cb.get("1|FEEDCONFIG").value.items(): #FeedDefinitions.iteritems():
-					if infile.find(k) > 0:
-						logger.debug ('feedType ==' + k)
-						feedtype = k
-						rowkeyschema = v['rowkeyschema']
-						rowschema = v['rowschema']
-						
-						for line in lines:
-							if line.startswith('HDR'):
-								pass
-							elif line.startswith('TRL'):
-								pass
-							else:
-								linevalues = lineToDictionary(rowkeyschema, rowschema, 1, feedtype, line)
-								logger.debug ('dictline ==' + linevalues['dictline'])
-								# linelist = cb.get(linevalues['dictline']).value
-								# linelist
-								#deleteLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
-								#insertLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
-								pass
-				logger.info ("Successfully processed file : " + infile + " with " + str(trlRowCount) + " lines.")
-			elif (trlRowCount == 0):
-				logger.info ("Successfully processed file : " + infile + " with " + str(trlRowCount) + " line.")
-		else:
-			logger.info("Rowcount mismatch")
-	"""	
+			lines = content.splitlines()
+			firstline = lines[0]
+			lastline = lines[len(lines)-1]
+			
+			trlRowCount = int(lastline.split("|")[1])
+			if ( trlRowCount == (len(lines) - 2) ):
+				if (trlRowCount > 0):
+					for k, v in cbDocument["CONFIGS"].items(): #FeedDefinitions.iteritems():
+						# logger.debug (v)
+	#				for k, v in startProcess.cb.get("1|FEEDCONFIG").value.items(): #FeedDefinitions.iteritems():
+						if infile.find(k) > 0:
+							feedtype = k
+							rowkeyschema = v['rowkeyschema']
+							rowschema = v['rowschema']
+							# logger.debug ('feedType ==' + k)
+							# logger.debug ("rowschema=================")
+							# logger.debug (rowschema)
+							# logger.debug ("rowkeyschema-----------------")
+							# logger.debug (rowkeyschema)
+							
+							for line in lines:
+								if line.startswith('HDR'):
+									pass
+								elif line.startswith('TRL'):
+									pass
+								else:
+									linevalues = lineToDictionary(rowkeyschema, rowschema, 1, feedtype, line)
+									logger.debug ('dictline ==' + linevalues['dictline'])
+									# linelist = cb.get(linevalues['dictline']).value
+									# linelist
+									#deleteLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
+									#insertLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
+									pass
+					logger.info ("Successfully processed file : " + infile + " with " + str(trlRowCount) + " lines.")
+				elif (trlRowCount == 0):
+					logger.info ("Successfully processed file : " + infile + " with " + str(trlRowCount) + " line.")
+			else:
+				logger.info("Rowcount mismatch")
+			
 	
 	
 def lineToDictionary(rowkeyschema, rowschema, tenantid, feedtype, line):
 	dictline = {}
 	tokens = line.split('|')
-	for i, token in enumerate(tokens):
-		if token:
-			dictline[rowschema[i]] = token
+	logger.debug(line)
+	if ( rowschema.length == tokens.length ):
+		for i, token in enumerate(tokens):
+			if token:
+				dictline[rowschema[i]] = token
 	
-	key= str(tenantid) + "|" + str(feedtype)
-	keylayout= "tenantid|feedtype"
-	
-	for j, keyname in enumerate(rowkeyschema):
-		#print ("keyindex:" + str(j) + " keyname:" + key + " rowSchemaindex:" + str(rowschema.index(key)) + " rowvalue:" + tokens[rowschema.index(key)])
-		key = key + "|" + tokens[rowschema.index(keyname)]
-		keylayout = keylayout + "|" + keyname 
+		key= str(tenantid) + "|" + str(feedtype)
+		keylayout= "tenantid|feedtype"
+		
+		for j, keyname in enumerate(rowkeyschema):
+			#print ("keyindex:" + str(j) + " keyname:" + key + " rowSchemaindex:" + str(rowschema.index(key)) + " rowvalue:" + tokens[rowschema.index(key)])
+			key = key + "|" + tokens[rowschema.index(keyname)]
+			keylayout = keylayout + "|" + keyname 
 
-	linevalues = {}
-	linevalues['linekey'] = key
-	linevalues['linekeylayout'] = keylayout
-	linevalues['dictline'] = dictline
-	return linevalues
-
+		linevalues = {}
+		linevalues['linekey'] = key
+		linevalues['linekeylayout'] = keylayout
+		linevalues['dictline'] = dictline
+		return linevalues
+	#else
+		
 def insertLine(rowkeyschema, rowschema, tenantid, feedtype, filename, line):
 		
 	linevalues = lineToDictionary(rowkeyschema, rowschema, tenantid, feedtype, line)
