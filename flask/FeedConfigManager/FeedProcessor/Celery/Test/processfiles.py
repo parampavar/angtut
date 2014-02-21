@@ -81,8 +81,6 @@ def startProcess():
 			if ( trlRowCount == (len(lines) - 2) ):
 				if (trlRowCount > 0):
 					for k, v in cbDocument["CONFIGS"].items(): #FeedDefinitions.iteritems():
-						# logger.debug (v)
-	#				for k, v in startProcess.cb.get("1|FEEDCONFIG").value.items(): #FeedDefinitions.iteritems():
 						if infile.find(k) > 0:
 							feedtype = k
 							rowkeyschema = v['rowkeyschema']
@@ -93,14 +91,14 @@ def startProcess():
 							# logger.debug ("rowkeyschema-----------------")
 							# logger.debug (rowkeyschema)
 							
-							for line in lines:
+							for lineno, line in enumerate(lines):
 								if line.startswith('HDR'):
 									pass
 								elif line.startswith('TRL'):
 									pass
 								else:
-									linevalues = lineToDictionary(rowkeyschema, rowschema, 1, feedtype, line)
-									logger.debug ('dictline ==' + linevalues['dictline'])
+									linevalues = lineToDictionary(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
+									logger.debug (line)
 									# linelist = cb.get(linevalues['dictline']).value
 									# linelist
 									#deleteLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
@@ -112,13 +110,68 @@ def startProcess():
 			else:
 				logger.info("Rowcount mismatch")
 			
+class FileProcessException(Exception):
+	"""
+    Attributes:
+        file -- name of the file that is being processed
+    """
+	def __init__(self, file):
+		self.file = file
+			
+class FileAccessException(FileProcessException):
+	pass
+
+class FileSchemaException(FileProcessException):
+	pass
+
+class RowSchemaMismatchException(FileSchemaException):
+	"""
+    Attributes:
+        file -- name of the file that is being processed
+        lineno -- line number that errored
+        line -- line errored
+        message -- message
+    """
+
+	def __init__(self, file, lineno, line, message):
+		FileSchemaException.__init__(self, file)
+		self.lineno = lineno
+		self.line = line
+		self.message = message
+
+class RowSchemaMoreMismatchException(RowSchemaMismatchException):
+	"""
+    Attributes:
+        file -- name of the file that is being processed
+        lineno -- line number that errored
+        line -- line errored
+        message -- message
+    """
+
+	def __init__(self, file, lineno, line):
+		RowSchemaMismatchException.__init__(self, file, lineno, line, "Line has more columns than defined in the Schema")
+
+class RowSchemaLessMismatchException(RowSchemaMismatchException):
+	"""
+    Attributes:
+        file -- name of the file that is being processed
+        lineno -- line number that errored
+        line -- line errored
+        message -- message
+    """
+
+	def __init__(self, file, lineno, line):
+		RowSchemaMismatchException.__init__(self, file, lineno, line, "Line has fewer columns than defined in the Schema")
+
 	
-	
-def lineToDictionary(rowkeyschema, rowschema, tenantid, feedtype, line):
+def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
 	tokens = line.split('|')
-	logger.debug(line)
-	if ( rowschema.length == tokens.length ):
+	logger.info(len(tokens))
+	logger.info(len(rowschema))
+	raise RowSchemaLessMismatchException(filename, lineno, line)
+	
+	if ( len(rowschema) == len(tokens) ):
 		for i, token in enumerate(tokens):
 			if token:
 				dictline[rowschema[i]] = token
@@ -138,9 +191,9 @@ def lineToDictionary(rowkeyschema, rowschema, tenantid, feedtype, line):
 		return linevalues
 	#else
 		
-def insertLine(rowkeyschema, rowschema, tenantid, feedtype, filename, line):
+def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 		
-	linevalues = lineToDictionary(rowkeyschema, rowschema, tenantid, feedtype, line)
+	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 	dictline =  linevalues['dictline']
 	#print (dictline)
 	if dictline.__contains__('Name'):
@@ -171,13 +224,13 @@ def insertLine(rowkeyschema, rowschema, tenantid, feedtype, filename, line):
 	except CouchbaseError as e:
 		print ( "insertLine: Exception: " + str(e.key))
 	
-def updateLine(line):
-	linevalues = lineToDictionary(line)
+def updateLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
+	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 	linelist = cb.get(linevalues['dictline']).value
 	cb.set(linevalues['linekey'], linelist)
 	
-def deleteLine(rowkeyschema, rowschema, tenantid, feedtype, filename, line):
-	linevalues = lineToDictionary(rowkeyschema, rowschema, tenantid, feedtype, line)
+def deleteLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
+	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 	
 	try:
 		cb.delete(linevalues['linekey'])
