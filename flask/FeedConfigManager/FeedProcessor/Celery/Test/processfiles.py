@@ -97,8 +97,12 @@ def startProcess():
 								elif line.startswith('TRL'):
 									pass
 								else:
-									linevalues = lineToDictionary(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
-									logger.debug (line)
+									try:
+										#linevalues = lineToDictionary(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
+										insertLine(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
+										logger.debug (line)
+									except:
+										pass
 									# linelist = cb.get(linevalues['dictline']).value
 									# linelist
 									#deleteLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
@@ -167,11 +171,12 @@ class RowSchemaLessMismatchException(RowSchemaMismatchException):
 def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
 	tokens = line.split('|')
-	logger.info(len(tokens))
-	logger.info(len(rowschema))
-	raise RowSchemaLessMismatchException(filename, lineno, line)
 	
-	if ( len(rowschema) == len(tokens) ):
+	if ( len(rowschema) > len(tokens) ):
+		raise RowSchemaLessMismatchException(filename, lineno, line)
+	elif ( len(rowschema) < len(tokens) ):
+		raise RowSchemaMoreMismatchException(filename, lineno, line)
+	elif ( len(rowschema) == len(tokens) ):
 		for i, token in enumerate(tokens):
 			if token:
 				dictline[rowschema[i]] = token
@@ -189,13 +194,12 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 		linevalues['linekeylayout'] = keylayout
 		linevalues['dictline'] = dictline
 		return linevalues
-	#else
+
 		
 def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 		
 	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 	dictline =  linevalues['dictline']
-	#print (dictline)
 	if dictline.__contains__('Name'):
 		dictline['NameLCase'] = dictline['Name'].lower()
 	if dictline.__contains__('FirstName'):
@@ -216,23 +220,25 @@ def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, li
 	dictline['feedtype'] = feedtype
 	dictline['filename'] = filename
 	dictline['keylayout'] = linevalues['linekeylayout']
-	#print ("insertLine:" + linevalues['linekey'])
+	logger.info ("insertLine:" + linevalues['linekey'])
 	
 	try:
-		cb.add(linevalues['linekey'], dictline)
+		startProcess.cb.add(linevalues['linekey'], dictline)
 		#pass
 	except CouchbaseError as e:
-		print ( "insertLine: Exception: " + str(e.key))
+		logger.info ( "insertLine: Exception: " + str(e.key))
+		raise
 	
 def updateLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
-	linelist = cb.get(linevalues['dictline']).value
-	cb.set(linevalues['linekey'], linelist)
+	linelist = startProcess.cb.get(linevalues['dictline']).value
+	startProcess.cb.set(linevalues['linekey'], linelist)
 	
 def deleteLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 	
 	try:
-		cb.delete(linevalues['linekey'])
+		startProcess.cb.delete(linevalues['linekey'])
 	except CouchbaseError as e:
 		print ( "deleteLine: Exception: " + str(e.key))	
+		raise
