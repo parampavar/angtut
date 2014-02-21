@@ -47,13 +47,18 @@ def startProcess():
 	path = "feeds/"
 	# logger.info("Listing 0|FEEDCONFIG doc from cb")
 	# logger.info(startProcess.FeedDefinitions)
-	logger.info("Listing 1|FEEDCONFIG doc from cb")
-	logger.info(startProcess.cb.get("1|FEEDCONFIG").value)
+	# logger.info("Listing 1|FEEDCONFIG doc from cb")
+	# logger.info(startProcess.cb.get("1|FEEDCONFIG").value)
 	for k, v in startProcess.cb.get("1|FEEDCONFIG").value.items(): #FeedDefinitions.iteritems():
-		logger.debug ("-----------------")
-		logger.debug (k)
-		logger.debug ("=================")
-		logger.debug (v)
+		if ( k == 'CONFIGS' ):
+			logger.debug (v['CUSTOMER'])
+		# if ( k == 'CUSTOMER' or k == 'SURGEON' ):
+			# rowkeyschema = v['rowkeyschema']
+			# rowschema = v['rowschema']
+			# logger.debug ("rowschema=================")
+			# logger.debug (rowschema)
+			# logger.debug ("rowkeyschema-----------------")
+			# logger.debug (rowkeyschema)
 	
 	"""
 	for infile in glob.glob( os.path.join(path, '*.txt') ):
