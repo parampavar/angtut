@@ -21,7 +21,9 @@ feedtype = None
 rowkeyschema = {}
 rowschema = {}
 
-app = Celery('processfiles', broker='amqp://celery:celery@localhost:5672/celery')
+#app = Celery('processfiles', broker='amqp://celery:celery@localhost:5672/celery')
+app = Celery('processfiles')
+app.config_from_object("celeryconfig")
 logger = get_task_logger(__name__)
 
 class DatabaseTask(Task):
@@ -80,7 +82,7 @@ def startProcess():
 			trlRowCount = int(lastline.split("|")[1])
 			if ( trlRowCount == (len(lines) - 2) ):
 				if (trlRowCount > 0):
-					for k, v in cbDocument["CONFIGS"].items(): #FeedDefinitions.iteritems():
+					for k, v in cbDocument["CONFIGS"].items():
 						if infile.find(k) > 0:
 							feedtype = k
 							rowkeyschema = v['rowkeyschema']
@@ -98,7 +100,6 @@ def startProcess():
 									pass
 								else:
 									try:
-										#linevalues = lineToDictionary(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
 										insertLine(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
 										logger.debug (line)
 									except:
@@ -128,7 +129,24 @@ class FileAccessException(FileProcessException):
 class FileSchemaException(FileProcessException):
 	pass
 
-class RowSchemaMismatchException(FileSchemaException):
+class RowException(FileSchemaException):
+	"""
+    Attributes:
+        file -- name of the file that is being processed
+        lineno -- line number that errored
+        line -- line errored
+        message -- message
+    """
+
+	def __init__(self, file, lineno, line, message=None):
+		FileSchemaException.__init__(self, file)
+		self.lineno = lineno
+		self.line = line
+		if message == None:
+			message = "Exception Occurred processing the row"
+		self.message = message
+
+class RowSchemaMismatchException(RowException):
 	"""
     Attributes:
         file -- name of the file that is being processed
@@ -138,7 +156,7 @@ class RowSchemaMismatchException(FileSchemaException):
     """
 
 	def __init__(self, file, lineno, line, message):
-		FileSchemaException.__init__(self, file)
+		RowException.__init__(self, file)
 		self.lineno = lineno
 		self.line = line
 		self.message = message
@@ -167,6 +185,17 @@ class RowSchemaLessMismatchException(RowSchemaMismatchException):
 	def __init__(self, file, lineno, line):
 		RowSchemaMismatchException.__init__(self, file, lineno, line, "Line has fewer columns than defined in the Schema")
 
+class RowDuplicateException(RowException):
+	"""
+    Attributes:
+        file -- name of the file that is being processed
+        lineno -- line number that errored
+        line -- line errored
+        message -- message
+    """
+
+	def __init__(self, file, lineno, line):
+		RowException.__init__(self, file, lineno, line, "Row already exists")
 	
 def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
