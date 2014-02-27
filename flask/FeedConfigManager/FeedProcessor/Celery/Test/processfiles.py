@@ -2,13 +2,14 @@ from celery import Celery
 from celery import Task
 from celery.utils.log import get_task_logger
 from collections import namedtuple
-from datetime import datetime
+# from datetime import datetime
 import os
 import glob
 import re
 import json
 import locking
-import time
+#import time
+import arrow
 
 from couchbase import Couchbase
 from couchbase.exceptions import CouchbaseError
@@ -204,8 +205,8 @@ class RowDuplicateException(RowException):
 	
 def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
-	dictline['updatedatetime'] = datetime.utcnow().isoformat()
-	dictline['insertdatetime'] = datetime.utcnow().isoformat()
+	dictline['updatedatetime'] = arrow.utcnow().isoformat()
+	dictline['insertdatetime'] = arrow.utcnow().isoformat()
 	dictline['changetype'] = 2
 	dictline['isinfeed'] = 1
 	dictline['deleteflag'] = 0
@@ -227,7 +228,6 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 		keylayout= "tenantid|feedtype"
 		
 		for j, keyname in enumerate(rowkeyschema):
-			#print ("keyindex:" + str(j) + " keyname:" + key + " rowSchemaindex:" + str(rowschema.index(key)) + " rowvalue:" + tokens[rowschema.index(key)])
 			key = key + "|" + tokens[rowschema.index(keyname)]
 			keylayout = keylayout + "|" + keyname 
 
@@ -250,15 +250,15 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 		dictline['rejectedflag'] = 0
 		dictline['errorflag'] = 0
 		linevalues = {}
-		linevalues['linekey'] = "{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", datetime.utcnow().isoformat())
+		linevalues['linekey'] = "{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", arrow.utcnow().isoformat())
 		linevalues['linekeylayout'] = "{0}|{1}|{2}|{3}|{4}".format("tenantid", "feedtype", "filename", "Exception", "datetime")
 		linevalues['dictline'] = dictline
 
 		if ( len(rowschema) > len(tokens) ):
-			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", datetime.utcnow().isoformat()))
+			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", arrow.utcnow().isoformat()))
 			return RowSchemaLessMismatchException(filename, lineno, line), linevalues
 		elif ( len(rowschema) < len(tokens) ):
-			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", datetime.utcnow().isoformat()))
+			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", arrow.utcnow().isoformat()))
 			return RowSchemaMoreMismatchException(filename, lineno, line), linevalues
 
 		
