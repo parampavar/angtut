@@ -102,8 +102,10 @@ def startProcess():
 									try:
 										insertLine(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
 										logger.debug (line)
-									except:
-										pass
+									except (RowSchemaLessMismatchException, RowSchemaMoreMismatchException) as eSchemaEx:
+										logger.debug (eSchemaEx)
+									except (RowDuplicateException) as eEx:
+										logger.debug (eEx)
 									# linelist = cb.get(linevalues['dictline']).value
 									# linelist
 									#deleteLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
@@ -139,6 +141,7 @@ class RowException(FileSchemaException):
     """
 
 	def __init__(self, file, lineno, line, message=None):
+		logger.debug("RowException:{0}|{1}|{2}".format(file, lineno, line))
 		FileSchemaException.__init__(self, file)
 		self.lineno = lineno
 		self.line = line
@@ -156,7 +159,8 @@ class RowSchemaMismatchException(RowException):
     """
 
 	def __init__(self, file, lineno, line, message):
-		RowException.__init__(self, file)
+		logger.debug("RowSchemaMismatchException:{0}|{1}|{2}".format(file, lineno, line))
+		RowException.__init__(self, file, lineno, line)
 		self.lineno = lineno
 		self.line = line
 		self.message = message
@@ -171,6 +175,7 @@ class RowSchemaMoreMismatchException(RowSchemaMismatchException):
     """
 
 	def __init__(self, file, lineno, line):
+		logger.debug("RowSchemaMoreMismatchException:{0}|{1}|{2}".format(file, lineno, line))
 		RowSchemaMismatchException.__init__(self, file, lineno, line, "Line has more columns than defined in the Schema")
 
 class RowSchemaLessMismatchException(RowSchemaMismatchException):
@@ -199,13 +204,21 @@ class RowDuplicateException(RowException):
 	
 def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
+	dictline['updatedatetime'] = datetime.utcnow().isoformat()
+	dictline['insertdatetime'] = datetime.utcnow().isoformat()
+	dictline['changetype'] = 2
+	dictline['isinfeed'] = 1
+	dictline['deleteflag'] = 0
+	dictline['rejectedflag'] = 0
+	dictline['errorflag'] = 0
+	dictline['tenantid'] = tenantid
+	dictline['feedtype'] = feedtype
+	dictline['filename'] = filename
+	dictline['line'] = line
+
 	tokens = line.split('|')
 	
-	if ( len(rowschema) > len(tokens) ):
-		raise RowSchemaLessMismatchException(filename, lineno, line)
-	elif ( len(rowschema) < len(tokens) ):
-		raise RowSchemaMoreMismatchException(filename, lineno, line)
-	elif ( len(rowschema) == len(tokens) ):
+	if ( len(rowschema) == len(tokens) ):
 		for i, token in enumerate(tokens):
 			if token:
 				dictline[rowschema[i]] = token
@@ -218,45 +231,56 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 			key = key + "|" + tokens[rowschema.index(keyname)]
 			keylayout = keylayout + "|" + keyname 
 
+		if dictline.__contains__('Name'):
+			dictline['NameLCase'] = dictline['Name'].lower()
+		if dictline.__contains__('FirstName'):
+			dictline['FirstNameLCase'] = dictline['FirstName'].lower()
+		if dictline.__contains__('LastName'):
+			dictline['LastNameLCase'] = dictline['LastName'].lower()
+		if dictline.__contains__('MiddleName'):
+			dictline['MiddleNameLCase'] = dictline['MiddleName'].lower()
+
 		linevalues = {}
 		linevalues['linekey'] = key
 		linevalues['linekeylayout'] = keylayout
 		linevalues['dictline'] = dictline
-		return linevalues
+
+		return None, linevalues
+	elif ( len(rowschema) != len(tokens) ):
+		dictline['rejectedflag'] = 0
+		dictline['errorflag'] = 0
+		linevalues = {}
+		linevalues['linekey'] = "{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", datetime.utcnow().isoformat())
+		linevalues['linekeylayout'] = "{0}|{1}|{2}|{3}|{4}".format("tenantid", "feedtype", "filename", "Exception", "datetime")
+		linevalues['dictline'] = dictline
+
+		if ( len(rowschema) > len(tokens) ):
+			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", datetime.utcnow().isoformat()))
+			return RowSchemaLessMismatchException(filename, lineno, line), linevalues
+		elif ( len(rowschema) < len(tokens) ):
+			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", datetime.utcnow().isoformat()))
+			return RowSchemaMoreMismatchException(filename, lineno, line), linevalues
 
 		
 def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
-		
-	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
+	anyException, linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 	dictline =  linevalues['dictline']
-	if dictline.__contains__('Name'):
-		dictline['NameLCase'] = dictline['Name'].lower()
-	if dictline.__contains__('FirstName'):
-		dictline['FirstNameLCase'] = dictline['FirstName'].lower()
-	if dictline.__contains__('LastName'):
-		dictline['LastNameLCase'] = dictline['LastName'].lower()
-	if dictline.__contains__('MiddleName'):
-		dictline['MiddleNameLCase'] = dictline['MiddleName'].lower()
 
-	dictline['updatedatetime'] = datetime.utcnow().isoformat()
-	dictline['insertdatetime'] = datetime.utcnow().isoformat()
-	dictline['changetype'] = 2
-	dictline['isinfeed'] = 1
-	dictline['deleteflag'] = 0
-	dictline['rejectedflag'] = 0
-	dictline['errorflag'] = 0
-	dictline['tenantid'] = tenantid
-	dictline['feedtype'] = feedtype
-	dictline['filename'] = filename
 	dictline['keylayout'] = linevalues['linekeylayout']
 	logger.info ("insertLine:" + linevalues['linekey'])
-	
+
 	try:
 		startProcess.cb.add(linevalues['linekey'], dictline)
-		#pass
+		if anyException: 
+			raise anyException
 	except CouchbaseError as e:
-		logger.info ( "insertLine: Exception: " + str(e.key))
-		raise
+		if (e is KeyExistsError):
+			logger.info ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, "RowDuplicateException"))
+			raise RowDuplicateException(filename, lineno, line)
+		else:
+			logger.info ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, e.__class__))
+			raise RowException(filename, lineno, line)
+
 	
 def updateLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)

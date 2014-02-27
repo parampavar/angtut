@@ -11,11 +11,6 @@ BROKER_URL = "amqp://celery:celery@localhost:5672/celery"
 CELERY_IMPORTS = ("processfiles", )
 
 CELERYBEAT_SCHEDULE = {
-    # 'add-every-30-seconds': {
-        # 'task': 'tasks.add',
-        # 'schedule': timedelta(seconds=30),
-        # 'args': (16, 27)
-    # },
     'processfiles-every-30-seconds': {
         'task': 'processfiles.startProcess',
         'schedule': timedelta(seconds=30)
