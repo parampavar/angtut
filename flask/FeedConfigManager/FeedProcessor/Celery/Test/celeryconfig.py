@@ -13,7 +13,8 @@ CELERY_IMPORTS = ("processfiles", )
 CELERYBEAT_SCHEDULE = {
     'processfiles-every-30-seconds': {
         'task': 'processfiles.startProcess',
-        'schedule': timedelta(seconds=30)
+        'schedule': timedelta(seconds=30),
+        'args': ([1])
     },
 }
 

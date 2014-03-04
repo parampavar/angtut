@@ -2,14 +2,14 @@ from celery import Celery
 from celery import Task
 from celery.utils.log import get_task_logger
 from collections import namedtuple
-# from datetime import datetime
+
 import os
 import glob
 import re
 import json
 import locking
-#import time
 import arrow
+import shortuuid
 
 from couchbase import Couchbase
 from couchbase.exceptions import CouchbaseError
@@ -18,52 +18,45 @@ from couchbase.views.iterator import RowProcessor
 from couchbase.views.params import UNSPEC, Query
 
 
+DOCUMENTTYPEKEYFORMAT = "{0}|{1}"
+DATABASENAME = "default"
+
 feedtype = None
 rowkeyschema = {}
 rowschema = {}
 
-#app = Celery('processfiles', broker='amqp://celery:celery@localhost:5672/celery')
 app = Celery('processfiles')
 app.config_from_object("celeryconfig")
 logger = get_task_logger(__name__)
 
+masterTenantid = 0
+documentType = "FEEDCONFIG"
+
+
+
 class DatabaseTask(Task):
 	abstract = True
 	_db = None
-	_FeedDefinitions = {}
+	_MasterFeedDefinitions = {}
 
 	@property
 	def cb(self):
 		if self._db is None:
-			self._db = Couchbase.connect(bucket='default')
+			self._db = Couchbase.connect(bucket=DATABASENAME)
 		return self._db
 
 	@property
-	def FeedDefinitions(self):
+	def MasterFeedDefinitions(self):
 		if self._db is None:
-			self._db = Couchbase.connect(bucket='default')
-			_FeedDefinitions = self._db.get("0|FEEDCONFIG").value
-		return _FeedDefinitions
+			self._db = Couchbase.connect(bucket=DATABASENAME)
+			_MasterFeedDefinitions = self._db.get(DOCUMENTTYPEKEYFORMAT.format(masterTenantid, documentType)).value
+		return _MasterFeedDefinitions
 
 @app.task(base=DatabaseTask)
-def startProcess():
+def startProcess(tenantid):
 	path = "feeds/"
-	# logger.info("Listing 0|FEEDCONFIG doc from cb")
-	# logger.info(startProcess.FeedDefinitions)
-	# logger.info("Listing 1|FEEDCONFIG doc from cb")
-	# logger.info(startProcess.cb.get("1|FEEDCONFIG").value)
-	cbDocument = startProcess.cb.get("1|FEEDCONFIG").value
+	cbDocument = startProcess.cb.get(DOCUMENTTYPEKEYFORMAT.format(tenantid, documentType)).value
 	if ( cbDocument ):
-		# for k, v in cbDocument["CONFIGS"].items(): #FeedDefinitions.iteritems():
-			# logger.debug (v)
-		# if ( k == 'CUSTOMER' or k == 'SURGEON' ):
-			# rowkeyschema = v['rowkeyschema']
-			# rowschema = v['rowschema']
-			# logger.debug ("rowschema=================")
-			# logger.debug (rowschema)
-			# logger.debug ("rowkeyschema-----------------")
-			# logger.debug (rowkeyschema)
-	
 		
 		for infile in glob.glob( os.path.join(path, '*.txt') ):
 			logger.info("Processing file : %s" % infile)
@@ -88,11 +81,6 @@ def startProcess():
 							feedtype = k
 							rowkeyschema = v['rowkeyschema']
 							rowschema = v['rowschema']
-							# logger.debug ('feedType ==' + k)
-							# logger.debug ("rowschema=================")
-							# logger.debug (rowschema)
-							# logger.debug ("rowkeyschema-----------------")
-							# logger.debug (rowkeyschema)
 							
 							for lineno, line in enumerate(lines):
 								if line.startswith('HDR'):
@@ -101,12 +89,14 @@ def startProcess():
 									pass
 								else:
 									try:
-										insertLine(infile, 1, feedtype, rowkeyschema, rowschema, lineno, line)
+										insertLine(infile, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
 										logger.debug (line)
 									except (RowSchemaLessMismatchException, RowSchemaMoreMismatchException) as eSchemaEx:
 										logger.debug (eSchemaEx)
 									except (RowDuplicateException) as eEx:
 										logger.debug (eEx)
+									except (Exception) as ex:
+										logger.debug (ex)
 									# linelist = cb.get(linevalues['dictline']).value
 									# linelist
 									#deleteLine(rowkeyschema, rowschema, 1, feedtype, infile, line)
@@ -189,6 +179,7 @@ class RowSchemaLessMismatchException(RowSchemaMismatchException):
     """
 
 	def __init__(self, file, lineno, line):
+		logger.debug("RowSchemaLessMismatchException:{0}|{1}|{2}".format(file, lineno, line))
 		RowSchemaMismatchException.__init__(self, file, lineno, line, "Line has fewer columns than defined in the Schema")
 
 class RowDuplicateException(RowException):
@@ -201,6 +192,7 @@ class RowDuplicateException(RowException):
     """
 
 	def __init__(self, file, lineno, line):
+		logger.debug("RowDuplicateException:{0}|{1}|{2}".format(file, lineno, line))
 		RowException.__init__(self, file, lineno, line, "Row already exists")
 	
 def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
@@ -247,18 +239,19 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 
 		return None, linevalues
 	elif ( len(rowschema) != len(tokens) ):
-		dictline['rejectedflag'] = 0
-		dictline['errorflag'] = 0
+		dictline['rejectedflag'] = 1
+		dictline['errorflag'] = 1
 		linevalues = {}
-		linevalues['linekey'] = "{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", arrow.utcnow().isoformat())
-		linevalues['linekeylayout'] = "{0}|{1}|{2}|{3}|{4}".format("tenantid", "feedtype", "filename", "Exception", "datetime")
+		exceptionLinekey = "{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", shortuuid.uuid())
+		linevalues['linekey'] = exceptionLinekey
+		linevalues['linekeylayout'] = "{0}|{1}|{2}|{3}|{4}".format("tenantid", "feedtype", "filename", "Exception", "shortuuid")
 		linevalues['dictline'] = dictline
 
 		if ( len(rowschema) > len(tokens) ):
-			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", arrow.utcnow().isoformat()))
+			logger.debug(exceptionLinekey)
 			return RowSchemaLessMismatchException(filename, lineno, line), linevalues
 		elif ( len(rowschema) < len(tokens) ):
-			logger.debug("A:{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", arrow.utcnow().isoformat()))
+			logger.debug(exceptionLinekey)
 			return RowSchemaMoreMismatchException(filename, lineno, line), linevalues
 
 		
@@ -275,10 +268,10 @@ def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, li
 			raise anyException
 	except CouchbaseError as e:
 		if (e is KeyExistsError):
-			logger.info ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, "RowDuplicateException"))
+			logger.debug ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, "RowDuplicateException"))
 			raise RowDuplicateException(filename, lineno, line)
 		else:
-			logger.info ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, e.__class__))
+			logger.debug ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, e.__class__))
 			raise RowException(filename, lineno, line)
 
 	
