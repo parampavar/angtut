@@ -14,7 +14,7 @@ CELERYBEAT_SCHEDULE = {
     'processfiles-every-30-seconds': {
         'task': 'processfiles.startProcess',
         'schedule': timedelta(seconds=30),
-        'args': ([1])
+        'args': ([1, "FEEDCONFIG"])
     },
 }
 
