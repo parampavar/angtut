@@ -110,7 +110,6 @@ def startProcess(tenantid, documentType):
 					logger.info ("Successfully processed file : " + infile + " with " + str(trlRowCount) + " line.")
 			else:
 				logger.info("Rowcount mismatch")
-			
 	
 def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
@@ -170,7 +169,6 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 		elif ( len(rowschema) < len(tokens) ):
 			logger.debug(exceptionLinekey)
 			return RowSchemaMoreMismatchException(filename, lineno, line), linevalues
-
 		
 def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	anyException, linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
@@ -190,7 +188,6 @@ def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, li
 		else:
 			logger.debug ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, e.__class__))
 			raise RowException(filename, lineno, line)
-
 	
 def updateLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
 	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)

@@ -10,6 +10,10 @@ BROKER_URL = "amqp://celery:celery@localhost:5672/celery"
 # CELERY_IMPORTS = ("tasks", )
 CELERY_IMPORTS = ("processfiles", )
 
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_EVENT_SERIALIZER = 'json'
+
 CELERYBEAT_SCHEDULE = {
     'processfiles-every-30-seconds': {
         'task': 'processfiles.startProcess',
