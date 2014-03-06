@@ -14,7 +14,7 @@ import shortuuid
 from couchbase import Couchbase
 from couchbase.exceptions import CouchbaseError
 from couchbase.exceptions import KeyExistsError, NotFoundError
-from couchbase.views.iterator import RowProcessor
+from couchbase.views.iterator import RowProcessor, View
 from couchbase.views.params import UNSPEC, Query
 
 from processingexceptions import *
@@ -92,7 +92,7 @@ def startProcess(tenantid, documentType):
 									pass
 								else:
 									try:
-										insertLine(infile, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
+										insertLine(infile, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line)
 										logger.debug (line)
 									except (RowSchemaLessMismatchException, RowSchemaMoreMismatchException) as eSchemaEx:
 										logger.debug (eSchemaEx)
@@ -111,7 +111,7 @@ def startProcess(tenantid, documentType):
 			else:
 				logger.info("Rowcount mismatch")
 	
-def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
+def lineToDictionary(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line):
 	dictline = {}
 	dictline['updatedatetime'] = arrow.utcnow().isoformat()
 	dictline['insertdatetime'] = arrow.utcnow().isoformat()
@@ -158,9 +158,9 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 		dictline['rejectedflag'] = 1
 		dictline['errorflag'] = 1
 		linevalues = {}
-		exceptionLinekey = "{0}|{1}|{2}|{3}|{4}".format(tenantid, feedtype, filename, "Exception", shortuuid.uuid())
+		exceptionLinekey = "{0}|{1}|{2}|{3}|{4}|{5}".format(tenantid, documentType, "EXCEPTION", feedtype, filename, shortuuid.uuid())
 		linevalues['linekey'] = exceptionLinekey
-		linevalues['linekeylayout'] = "{0}|{1}|{2}|{3}|{4}".format("tenantid", "feedtype", "filename", "Exception", "shortuuid")
+		linevalues['linekeylayout'] = "{0}|{1}|{2}|{3}|{4}|{5}".format("tenantid", "documentType", "EXCEPTION", "feedtype", "filename", "shortuuid")
 		linevalues['dictline'] = dictline
 
 		if ( len(rowschema) > len(tokens) ):
@@ -170,8 +170,8 @@ def lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, line
 			logger.debug(exceptionLinekey)
 			return RowSchemaMoreMismatchException(filename, lineno, line), linevalues
 		
-def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
-	anyException, linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
+def insertLine(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line):
+	anyException, linevalues = lineToDictionary(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line)
 	dictline =  linevalues['dictline']
 
 	dictline['keylayout'] = linevalues['linekeylayout']
@@ -189,16 +189,24 @@ def insertLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, li
 			logger.debug ('insertLine: Exception={3}, FileName={0}, LineNo={1}, Line={2}'.format(filename, lineno, line, e.__class__))
 			raise RowException(filename, lineno, line)
 	
-def updateLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
-	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
+def updateLine(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line):
+	linevalues = lineToDictionary(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line)
 	linelist = startProcess.cb.get(linevalues['dictline']).value
 	startProcess.cb.set(linevalues['linekey'], linelist)
 	
-def deleteLine(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line):
-	linevalues = lineToDictionary(filename, tenantid, feedtype, rowkeyschema, rowschema, lineno, line)
+def deleteLine(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line):
+	linevalues = lineToDictionary(filename, tenantid, documentType, feedtype, rowkeyschema, rowschema, lineno, line)
 	
 	try:
 		startProcess.cb.delete(linevalues['linekey'])
 	except CouchbaseError as e:
 		print ( "deleteLine: Exception: " + str(e.key))	
 		raise
+
+@app.task(base=DatabaseTask)
+def startErrorReportProcess(tenantid, documentType):
+	path = "feeds/"
+	DocumentType = documentType
+
+	for result in View(startErrorReportProcess.cb, "dev_Tenant1CustomerRejected", "Tenant1CustomerRejected", include_docs=True):
+		logger.info("emitted key: {0}, doc_id: {1}".format(result.key, result.doc.value))
